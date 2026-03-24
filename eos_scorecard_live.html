@@ -9,8 +9,8 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #0a0e1a;
-  color: #e2e4ea;
+  background: #f5f6f8;
+  color: #111827;
   min-height: 100vh;
 }
 
@@ -21,14 +21,14 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid #e5e7eb;
   position: relative;
 }
 .page-label {
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: rgba(255,255,255,0.25);
+  color: #9ca3af;
   font-weight: 600;
   margin-bottom: 1rem;
   display: flex;
@@ -39,13 +39,13 @@ body {
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(255,255,255,0.08);
+  background: #e5e7eb;
 }
 .page-title {
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #fff;
+  color: #111827;
   margin-bottom: 0.25rem;
   line-height: 1.1;
 }
@@ -57,8 +57,8 @@ body {
   min-height: 100vh; flex-direction: column; gap: 16px;
 }
 .login-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 16px;
   padding: 3rem;
   text-align: center;
@@ -66,37 +66,37 @@ body {
   width: 100%;
 }
 .login-logo { font-size: 10px; text-transform: uppercase; letter-spacing: 0.16em; color: #34d399; margin-bottom: 12px; }
-.login-card h2 { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 8px; }
-.login-card p { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 2rem; line-height: 1.6; }
-.btn-login { background: #2563eb; color: #fff; border: none; border-radius: 8px; padding: 14px 32px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; letter-spacing: 0.01em; }
+.login-card h2 { font-size: 26px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+.login-card p { font-size: 13px; color: #6b7280; margin-bottom: 2rem; line-height: 1.6; }
+.btn-login { background: #2563eb; color: #111827; border: none; border-radius: 8px; padding: 14px 32px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; letter-spacing: 0.01em; }
 .btn-login:hover { background: #1d4ed8; }
-.spinner { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #34d399; border-radius: 50%; animation: spin 0.8s linear infinite; }
+.spinner { width: 32px; height: 32px; border: 3px solid #e5e7eb; border-top-color: #34d399; border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-#loading-screen p { color: rgba(255,255,255,0.4); font-size: 13px; }
-.error-card { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3); border-radius: 12px; padding: 2rem; max-width: 600px; }
+#loading-screen p { color: #6b7280; font-size: 13px; }
+.error-card { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 12px; padding: 2rem; max-width: 600px; }
 .error-card h3 { color: #f87171; font-size: 16px; margin-bottom: 8px; }
 .error-card p { color: rgba(255,255,255,0.5); font-size: 11px; line-height: 1.6; white-space: pre-wrap; }
-.btn-retry { background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); border-radius: 6px; padding: 8px 20px; font-size: 12px; cursor: pointer; margin-top: 1rem; }
+.btn-retry { background: none; border: 1px solid rgba(255,255,255,0.2); color: #6b7280; border-radius: 6px; padding: 8px 20px; font-size: 12px; cursor: pointer; margin-top: 1rem; }
 
 /* ── Header bar ── */
 .topbar {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: rgba(10,14,26,0.95);
+  background: rgba(255,255,255,0.97);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid #e5e7eb;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 2rem; height: 52px;
 }
 .topbar-left { display: flex; align-items: center; gap: 16px; }
-.topbar-brand { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.01em; }
+.topbar-brand { font-size: 13px; font-weight: 700; color: #111827; letter-spacing: 0.01em; }
 .topbar-brand span { color: #34d399; }
 .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #34d399; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-.topbar-period { font-size: 11px; color: rgba(255,255,255,0.35); }
+.topbar-period { font-size: 11px; color: #9ca3af; }
 .topbar-right { display: flex; align-items: center; gap: 12px; }
-#last-updated { font-size: 10px; color: rgba(255,255,255,0.25); }
-.btn-signout { background: none; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.4); border-radius: 4px; padding: 4px 12px; font-size: 10px; cursor: pointer; }
-.btn-signout:hover { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); }
+#last-updated { font-size: 10px; color: #9ca3af; }
+.btn-signout { background: none; border: 1px solid #e5e7eb; color: #6b7280; border-radius: 4px; padding: 4px 12px; font-size: 10px; cursor: pointer; }
+.btn-signout:hover { border-color: #9ca3af; color: rgba(255,255,255,0.7); }
 
 #dashboard { padding-top: 52px; }
 
@@ -106,130 +106,130 @@ body {
 .kpi-row-3 { grid-template-columns: repeat(3, 1fr); }
 .kpi-row-2 { grid-template-columns: repeat(2, 1fr); }
 .kcard {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 10px;
   padding: 1.25rem 1.5rem;
 }
-.kcard.green  { border-color: rgba(52,211,153,0.3);  background: rgba(52,211,153,0.06); }
-.kcard.red    { border-color: rgba(248,113,113,0.3);  background: rgba(248,113,113,0.05); }
-.kcard.amber  { border-color: rgba(251,191,36,0.3);   background: rgba(251,191,36,0.05); }
-.kcard.blue   { border-color: rgba(96,165,250,0.25);  background: rgba(96,165,250,0.05); }
-.kcard.purple { border-color: rgba(167,139,250,0.25); background: rgba(167,139,250,0.05); }
-.kval  { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; color: #fff; }
-.kval.pos { color: #34d399; }
-.kval.neg { color: #f87171; }
-.kval.amb { color: #fbbf24; }
-.kval.blu { color: #60a5fa; }
-.klbl  { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 5px; line-height: 1.3; }
-.ksub  { font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 3px; }
+.kcard.green  { border-color: #6ee7b7; background: #f0fdf4; }
+.kcard.red    { border-color: #fca5a5; background: #fef2f2; }
+.kcard.amber  { border-color: #fcd34d; background: #fffbeb; }
+.kcard.blue   { border-color: #93c5fd; background: #eff6ff; }
+.kcard.purple { border-color: #c4b5fd; background: #f5f3ff; }
+.kval  { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; color: #111827; }
+.kval.pos { color: #059669; }
+.kval.neg { color: #dc2626; }
+.kval.amb { color: #d97706; }
+.kval.blu { color: #1d4ed8; }
+.klbl  { font-size: 11px; color: #6b7280; margin-top: 5px; line-height: 1.3; }
+.ksub  { font-size: 10px; color: #9ca3af; margin-top: 3px; }
 .ktrend { font-size: 11px; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
-.ktrend.up   { color: #34d399; }
-.ktrend.down { color: #f87171; }
-.ktrend.flat { color: rgba(255,255,255,0.3); }
+.ktrend.up   { color: #059669; }
+.ktrend.down { color: #dc2626; }
+.ktrend.flat { color: #9ca3af; }
 
 /* ── Charts ── */
 .chart-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .chart-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 .chart-grid-32 { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; }
 .cbox {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 10px;
   padding: 1.125rem;
 }
 .cbox-lbl {
-  font-size: 11px; color: rgba(255,255,255,0.4);
+  font-size: 11px; color: #4b5563;
   margin-bottom: 10px;
   display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;
 }
 .cleg { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.cli  { display: flex; align-items: center; gap: 4px; font-size: 10px; color: rgba(255,255,255,0.35); }
+.cli  { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #6b7280; }
 
 /* ── Scorecard table ── */
-.sc-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.07); }
+.sc-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid #e5e7eb; }
 table.sc { width: 100%; border-collapse: collapse; font-size: 13px; }
 table.sc thead th {
-  background: rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.35);
+  background: #ffffff;
+  color: #6b7280;
   font-weight: 600; font-size: 10px;
   text-transform: uppercase; letter-spacing: 0.07em;
   padding: 10px 14px; text-align: center;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  border-bottom: 1px solid #e5e7eb;
   white-space: nowrap;
 }
 table.sc thead th.left { text-align: left; }
-table.sc thead th.act-h { color: #34d399; background: rgba(52,211,153,0.05); }
+table.sc thead th.act-h { color: #065f46; background: #f0fdf4; }
 table.sc tbody td {
-  padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.65); text-align: center; white-space: nowrap;
+  padding: 10px 14px; border-bottom: 1px solid #f3f4f6;
+  color: #374151; text-align: center; white-space: nowrap;
 }
 table.sc tbody td.left { text-align: left; }
-table.sc tbody tr.cat td { background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+table.sc tbody tr.cat td { background: #ffffff; color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
 .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-.dot.g { background: #34d399; } .dot.y { background: #fbbf24; } .dot.r { background: #f87171; } .dot.n { background: rgba(255,255,255,0.2); }
+.dot.g { background: #059669; } .dot.y { background: #d97706; } .dot.r { background: #dc2626; } .dot.n { background: #d1d5db; }
 .rag { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 500; }
-.rag.g { color: #34d399; } .rag.y { color: #fbbf24; } .rag.r { color: #f87171; } .rag.n { color: rgba(255,255,255,0.3); }
+.rag.g { color: #059669; } .rag.y { color: #d97706; } .rag.r { color: #dc2626; } .rag.n { color: #9ca3af; }
 .badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 3px; }
-.badge.g { background: rgba(52,211,153,0.15); color: #34d399; }
-.badge.y { background: rgba(251,191,36,0.15); color: #fbbf24; }
-.badge.r { background: rgba(248,113,113,0.15); color: #f87171; }
-.badge.n { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+.badge.g { background: #d1fae5; color: #065f46; }
+.badge.y { background: #fef3c7; color: #d97706; }
+.badge.r { background: #fee2e2; color: #dc2626; }
+.badge.n { background: #ffffff; color: rgba(255,255,255,0.3); }
 
 /* ── Rocks ── */
 .rock-row {
   display: grid; grid-template-columns: 1fr 160px 110px 120px;
   align-items: center; gap: 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 8px; padding: 14px 18px; margin-bottom: 8px;
 }
-.rock-row.on-track { border-color: rgba(52,211,153,0.2); }
-.rock-row.at-risk  { border-color: rgba(251,191,36,0.25); background: rgba(251,191,36,0.04); }
-.rock-row.missed   { border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.05); }
-.rock-name  { font-size: 14px; font-weight: 500; color: #fff; line-height: 1.3; }
-.rock-note  { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 3px; }
-.rock-owner { font-size: 12px; color: rgba(255,255,255,0.4); }
+.rock-row.on-track { border-color: #6ee7b7; background: #f0fdf4; }
+.rock-row.at-risk  { border-color: #fcd34d; background: #fffbeb; }
+.rock-row.missed   { border-color: #fca5a5; background: #fef2f2; }
+.rock-name  { font-size: 14px; font-weight: 500; color: #111827; line-height: 1.3; }
+.rock-note  { font-size: 10px; color: #9ca3af; margin-top: 3px; }
+.rock-owner { font-size: 12px; color: #6b7280; }
 .rock-status { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
 .rock-pct-val { font-size: 18px; font-weight: 800; }
-.prog-bar { height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-top: 4px; }
+.prog-bar { height: 5px; background: #e5e7eb; border-radius: 3px; margin-top: 4px; }
 .prog-fill { height: 100%; border-radius: 3px; }
-.prog-fill.g { background: #34d399; } .prog-fill.y { background: #fbbf24; } .prog-fill.r { background: #f87171; }
+.prog-fill.g { background: #059669; } .prog-fill.y { background: #d97706; } .prog-fill.r { background: #dc2626; }
 .rock-badges { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
 .rock-badge { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 5px; }
-.rock-badge.g  { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.25); }
-.rock-badge.y  { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
-.rock-badge.r  { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
+.rock-badge.g  { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+.rock-badge.y  { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
+.rock-badge.r  { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
 
 /* ── TechOS goal banner ── */
 .tos-banner {
-  background: linear-gradient(135deg, rgba(15,23,42,0.9) 0%, rgba(30,58,95,0.9) 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
   border: 1px solid rgba(52,211,153,0.2);
   border-radius: 12px; padding: 1.5rem; margin-bottom: 16px;
 }
 .tos-banner-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-.tos-banner-title { font-size: 20px; font-weight: 700; color: #fff; }
+.tos-banner-title { font-size: 20px; font-weight: 700; color: #111827; }
 .tos-banner-title span { color: #34d399; }
-.tos-banner-sub { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; }
+.tos-banner-sub { font-size: 11px; color: #6b7280; margin-top: 4px; }
 .tos-pct-big { font-size: 48px; font-weight: 800; color: #34d399; letter-spacing: -0.03em; line-height: 1; }
 .tos-pct-lbl { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 4px; }
-.tos-prog-track { height: 10px; background: rgba(255,255,255,0.08); border-radius: 5px; overflow: hidden; }
+.tos-prog-track { height: 10px; background: rgba(255,255,255,0.15); border-radius: 5px; overflow: hidden; }
 .tos-prog-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #059669, #34d399); transition: width 1s ease; }
-.tos-prog-labels { display: flex; justify-content: space-between; font-size: 9px; color: rgba(255,255,255,0.25); margin-top: 5px; }
+.tos-prog-labels { display: flex; justify-content: space-between; font-size: 9px; color: #9ca3af; margin-top: 5px; }
 
 /* ── Funnel ── */
 .funnel-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
 .funnel-row:last-child { border-bottom: none; }
-.fkey { color: rgba(255,255,255,0.45); }
-.fval { font-weight: 600; color: #fff; }
-.fval.g { color: #34d399; } .fval.b { color: #60a5fa; }
+.fkey { color: #6b7280; }
+.fval { font-weight: 600; color: #111827; }
+.fval.g { color: #059669; } .fval.b { color: #1d4ed8; }
 
 /* ── Divider ── */
-.divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 1.5rem 0; }
+.divider { border: none; border-top: 1px solid #e5e7eb; margin: 1.5rem 0; }
 
 /* ── Trend arrow ── */
-.trend-up   { color: #34d399; font-size: 11px; }
-.trend-down { color: #f87171; font-size: 11px; }
+.trend-up   { color: #059669; font-size: 11px; }
+.trend-down { color: #dc2626; font-size: 11px; }
 </style>
 </head>
 <body>
@@ -279,7 +279,7 @@ table.sc tbody tr.cat td { background: rgba(255,255,255,0.03); color: rgba(255,2
   <div class="page">
     <div class="page-label">Section 1 of 6 &nbsp;·&nbsp; Annual targets</div>
     <div class="page-title">2026 Revenue <span>Targets</span></div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:1.5rem;">15% growth goal &nbsp;·&nbsp; 10% net margin &nbsp;·&nbsp; Employee and customer satisfaction</div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:1.5rem;">15% growth goal &nbsp;·&nbsp; 10% net margin &nbsp;·&nbsp; Employee and customer satisfaction</div>
     <div class="kpi-row kpi-row-4" style="margin-bottom:16px;">
       <div class="kcard blue">
         <div class="kval blu" id="t-total-rev">-</div>
@@ -369,7 +369,7 @@ table.sc tbody tr.cat td { background: rgba(255,255,255,0.03); color: rgba(255,2
   <div class="page">
     <div class="page-label">Section 3 of 6 &nbsp;·&nbsp; Weekly scorecard</div>
     <div class="page-title">Weekly <span>Metrics</span></div>
-    <div style="display:flex;gap:16px;margin-bottom:1rem;font-size:11px;color:rgba(255,255,255,0.3);">
+    <div style="display:flex;gap:16px;margin-bottom:1rem;font-size:11px;color:#6b7280;">
       <span style="display:flex;align-items:center;gap:5px;"><span class="dot g"></span>On target</span>
       <span style="display:flex;align-items:center;gap:5px;"><span class="dot y"></span>Within 90%</span>
       <span style="display:flex;align-items:center;gap:5px;"><span class="dot r"></span>Below target</span>
@@ -389,7 +389,7 @@ table.sc tbody tr.cat td { background: rgba(255,255,255,0.03); color: rgba(255,2
           </tr>
         </thead>
         <tbody id="scorecard-body">
-          <tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,0.2);padding:2rem;">Loading...</td></tr>
+          <tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:2rem;">Loading...</td></tr>
         </tbody>
       </table>
     </div>
@@ -497,7 +497,7 @@ table.sc tbody tr.cat td { background: rgba(255,255,255,0.03); color: rgba(255,2
           <div class="klbl">Go-get number</div>
         </div>
       </div>
-      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:1.25rem;">
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:1.25rem;">
         <div class="funnel-row"><span class="fkey">2025 actual revenue</span><span class="fval" id="f-hd-2025">-</span></div>
         <div class="funnel-row"><span class="fkey">New customers needed</span><span class="fval b" id="f-hd-cust">-</span></div>
         <div class="funnel-row"><span class="fkey">Opportunities needed (40% win rate)</span><span class="fval b" id="f-hd-opps">-</span></div>
@@ -533,8 +533,8 @@ let msalInstance, hdChartObj, psChartObj;
 Chart.defaults.color = 'rgba(255,255,255,0.4)';
 Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 Chart.defaults.font.size = 11;
-const gc = 'rgba(255,255,255,0.06)';
-const lc = 'rgba(255,255,255,0.35)';
+const gc = 'rgba(0,0,0,0.06)';
+const lc = '#374151';
 
 function show(id) {
   ['login-screen','loading-screen','error-screen','dashboard'].forEach(s => {
@@ -701,13 +701,13 @@ function renderScorecard(v) {
     const r1 = ragCls(w1, tgt, lib), r2 = ragCls(w2, tgt, lib), rm = ragCls(ms, tgt * 2, lib);
     // Trend arrow between weeks
     const trendArrow = w1 != null && w2 != null
-      ? (w2 > w1 ? '<span class="trend-up">▲</span>' : w2 < w1 ? '<span class="trend-down">▼</span>' : '<span style="color:rgba(255,255,255,0.2);">—</span>')
+      ? (w2 > w1 ? '<span class="trend-up">▲</span>' : w2 < w1 ? '<span class="trend-down">▼</span>' : '<span style="color:#9ca3af;">—</span>')
       : '';
     html += `<tr>
       <td class="left" style="padding-left:20px;color:rgba(255,255,255,0.25);font-size:11px;"></td>
-      <td class="left" style="color:rgba(255,255,255,0.7);font-size:13px;">${meas}</td>
-      <td class="left" style="color:rgba(255,255,255,0.3);font-size:11px;">${tgtD}</td>
-      <td class="left" style="color:rgba(255,255,255,0.35);font-size:11px;">${owner}</td>
+      <td class="left" style="color:#111827;font-size:13px;">${meas}</td>
+      <td class="left" style="color:#9ca3af;font-size:11px;">${tgtD}</td>
+      <td class="left" style="color:#6b7280;font-size:11px;">${owner}</td>
       <td><span class="rag ${r1}"><span class="dot ${r1}"></span>${w1d}</span></td>
       <td><span class="rag ${r2}"><span class="dot ${r2}"></span>${w2d}</span> ${trendArrow}</td>
       <td><span class="badge ${rm}">${msd}</span></td>
@@ -847,7 +847,7 @@ function renderRocks(v) {
   arEl.textContent=risk+' At Risk'; arEl.style.display=risk>0?'':'none';
   const mEl=document.getElementById('rocks-missed');
   if(mEl){ mEl.textContent=missed+' Missed'; mEl.style.display=missed>0?'':'none'; }
-  document.getElementById('rocks-grid').innerHTML=html||'<div style="color:rgba(255,255,255,0.2);">No rocks found</div>';
+  document.getElementById('rocks-grid').innerHTML=html||'<div style="color:#9ca3af;">No rocks found</div>';
 }
 
 // ── Render funnel ──
