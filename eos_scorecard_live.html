@@ -581,7 +581,7 @@ function renderCharts(v) {
 }
 
 function renderRocks(v) {
-  let on=0, risk=0, html='';
+  let on=0, risk=0, missed=0, html='';
   for (let i=1; i<v.length; i++) {
     const r=v[i]; if(!r||!r[0]) continue;
     const name=(r[0]||'').toString().replace(/ /g,'').trim();
@@ -589,12 +589,16 @@ function renderRocks(v) {
     const status=(r[4]||'').toString().trim();
     const pct=typeof r[5]==='number'?Math.round(r[5]*100):0;
     const notes=(r[7]||'').toString().trim();
-    const isRisk=status==='At Risk', isDone=pct===100;
-    if(isRisk) risk++; else on++;
-    const cls=isRisk?'at-risk':isDone?'complete':'';
-    const dotC=isRisk?'y':'g', txtC=isRisk?'#d97706':'#15803d';
-    const barC=isRisk?(pct<50?'r':'y'):'g';
-    html+=`<div class="rock-row ${cls}">
+    const isRisk=status==='At Risk';
+    const isMissed=status==='Missed'||status==='Off Track';
+    const isDone=pct===100;
+    if(isMissed) missed++; else if(isRisk) risk++; else on++;
+    const cls=isMissed?'at-risk':isRisk?'at-risk':isDone?'complete':'';
+    const dotC=isMissed?'r':isRisk?'y':'g';
+    const txtC=isMissed?'#dc2626':isRisk?'#d97706':'#15803d';
+    const barC=isMissed?'r':isRisk?'y':'g';
+    const rowStyle=isMissed?'border-color:#fca5a5;background:#fef2f2;':isRisk?'border-color:#fcd34d;background:#fffbeb;':isDone?'border-color:#6ee7b7;background:#f0fdf4;':'';
+    html+=`<div class="rock-row ${cls}" style="${rowStyle}">
       <div><div class="rock-name">${name}</div>${notes?`<div class="rock-note">${notes}</div>`:''}</div>
       <div class="rock-owner">${owner}</div>
       <div><span class="rag" style="color:${txtC};display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;"><span class="dot ${dotC}"></span>${status}</span></div>
@@ -602,7 +606,7 @@ function renderRocks(v) {
     </div>`;
   }
   document.getElementById('rocks-on-track').textContent=on+' On Track';
-  document.getElementById('rocks-at-risk').textContent=risk+' At Risk';
+  document.getElementById('rocks-at-risk').textContent=risk+' At Risk'+(missed?' · '+missed+' Missed':'');
   document.getElementById('rocks-grid').innerHTML=html||'<div style="color:#9ca3af;">No rocks found</div>';
 }
 
