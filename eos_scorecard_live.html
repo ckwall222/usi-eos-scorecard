@@ -465,7 +465,9 @@ async function loadData(token) {
     // Get site, then drive, then file by path
     const site = await api(token, '/sites/universalsystemsinc100.sharepoint.com:/sites/L10');
     const drive = await api(token, '/sites/' + site.id + '/drive');
-    const file  = await api(token, '/drives/' + drive.id + "/root:/TechOS PL updated.xlsx:");
+    const search = await api(token, '/drives/' + drive.id + "/root/search(q='EOS Scorecard')");
+    const file = search.value.find(f => f.name === 'EOS Scorecard Data Sheet.xlsx') || search.value[0];
+    if (!file) throw new Error('EOS Scorecard Data Sheet.xlsx not found in L10. Check the file exists in Documents.');
     const base  = '/drives/' + drive.id + '/items/' + file.id + '/workbook';
     const [sc, rocks, funnel] = await Promise.all([
       api(token, base + "/worksheets('EOS%20Scorecard%20Tracking')/usedRange"),
@@ -483,7 +485,9 @@ async function loadData(token) {
       setLoading('Loading TechOS financial data...');
       const finSite  = await api(token, '/sites/universalsystemsinc100.sharepoint.com:/sites/Finance');
       const finDrive = await api(token, '/sites/' + finSite.id + '/drive');
-      const finFile  = await api(token, '/drives/' + finDrive.id + '/root:/TechOS PL updated.xlsx:');
+      const finSearch = await api(token, '/drives/' + finDrive.id + "/root/search(q='TechOS PL')");
+      const finFile   = finSearch.value.find(f => f.name === 'TechOS PL updated.xlsx') || finSearch.value[0];
+      if (!finFile) throw new Error('TechOS PL updated.xlsx not found in Finance drive.');
       const tosBase  = '/drives/' + finDrive.id + '/items/' + finFile.id + '/workbook';
       const tosSheet = await api(token, tosBase + "/worksheets('Sheet1')/usedRange");
       renderTechOS(tosSheet.values);
