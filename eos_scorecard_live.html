@@ -228,11 +228,11 @@ table.sc tbody td.cat { font-weight: 700; color: #111827; font-size: 10px; backg
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-authentication-library-for-js/2.36.0/msal-browser.min.js"></script>
 <script>
 const CONFIG = {
   clientId: '3565db63-2a61-4eaf-a84e-7577e5369a5c',
-  tenantId: 'YOUR_TENANT_ID_HERE',
+  tenantId: '53e2c3bd-d5d4-443d-bd75-e93b8d6a32c1',
   shareId:  'u!aHR0cHM6Ly91bml2ZXJzYWxzeXN0ZW1zaW5jMTAwLnNoYXJlcG9pbnQuY29tLzp4Oi9zL0wxMC9JUURSZ3B4VTctZ2lSSUN3Nkl2YmJGVzNBYmgxU1FCOHpYbGxJc0ExTWN1d19pMD9lPW11QmFtVQ'
 };
 
@@ -247,43 +247,46 @@ function show(id) {
 function setLoading(msg) { show('loading-screen'); document.getElementById('loading-msg').textContent = msg; }
 function showError(msg)  { show('error-screen');  document.getElementById('error-msg').textContent = msg; }
 
+function getMsal() {
+  return new msal.PublicClientApplication({
+    auth: {
+      clientId: CONFIG.clientId,
+      authority: 'https://login.microsoftonline.com/' + CONFIG.tenantId,
+      redirectUri: window.location.href.split('?')[0].split('#')[0]
+    },
+    cache: { cacheLocation: 'sessionStorage' }
+  });
+}
+
 async function init() {
-  if (CONFIG.clientId === '3565db63-2a61-4eaf-a84e-7577e5369a5c') { show('login-screen'); return; }
-  try {
-    msalInstance = new msal.PublicClientApplication({
-      auth: { clientId: CONFIG.clientId, authority: 'https://login.microsoftonline.com/' + CONFIG.tenantId, redirectUri: window.location.href.split('?')[0] }
-    });
-    await msalInstance.initialize();
-    await msalInstance.handleRedirectPromise();
-    const accounts = msalInstance.getAllAccounts();
-    if (accounts.length > 0) {
-      try {
-        const r = await msalInstance.acquireTokenSilent({ scopes: ['Files.Read','Sites.Read.All'], account: accounts[0] });
-        await loadData(r.accessToken);
-      } catch { show('login-screen'); }
-    } else { show('login-screen'); }
-  } catch(e) { show('login-screen'); }
+  msalInstance = getMsal();
+  await msalInstance.initialize();
+  const result = await msalInstance.handleRedirectPromise();
+  if (result && result.accessToken) {
+    await loadData(result.accessToken);
+    return;
+  }
+  const accounts = msalInstance.getAllAccounts();
+  if (accounts.length > 0) {
+    try {
+      const r = await msalInstance.acquireTokenSilent({ scopes: ['Files.Read', 'Sites.Read.All'], account: accounts[0] });
+      await loadData(r.accessToken);
+    } catch { show('login-screen'); }
+  } else {
+    show('login-screen');
+  }
 }
 
 async function signIn() {
-  if (!msalInstance) {
-    msalInstance = new msal.PublicClientApplication({
-      auth: { clientId: CONFIG.clientId, authority: 'https://login.microsoftonline.com/' + CONFIG.tenantId, redirectUri: window.location.href.split('?')[0] }
-    });
-    await msalInstance.initialize();
-  }
-  try {
-    setLoading('Signing in...');
-    const r = await msalInstance.loginPopup({ scopes: ['Files.Read','Sites.Read.All'] });
-    await loadData(r.accessToken);
-  } catch(e) {
-    showError('Sign-in failed. Make sure your Client ID and Tenant ID are filled in.
-
-Error: ' + e.message);
-  }
+  msalInstance = getMsal();
+  await msalInstance.initialize();
+  await msalInstance.loginRedirect({ scopes: ['Files.Read', 'Sites.Read.All'] });
 }
 
-function signOut() { if (msalInstance) msalInstance.logoutPopup(); show('login-screen'); }
+function signOut() {
+  if (msalInstance) msalInstance.logoutRedirect();
+  show('login-screen');
+}
 
 async function api(token, path) {
   const r = await fetch('https://graph.microsoft.com/v1.0' + path, { headers: { Authorization: 'Bearer ' + token } });
