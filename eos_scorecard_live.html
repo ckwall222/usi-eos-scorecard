@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.10.0/lib/msal-browser.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>USI EOS Scorecard 2026</title>
@@ -228,7 +229,7 @@ table.sc tbody td.cat { font-weight: 700; color: #111827; font-size: 10px; backg
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-authentication-library-for-js/2.36.0/msal-browser.min.js"></script>
+
 <script>
 const CONFIG = {
   clientId: '3565db63-2a61-4eaf-a84e-7577e5369a5c',
@@ -247,21 +248,25 @@ function show(id) {
 function setLoading(msg) { show('loading-screen'); document.getElementById('loading-msg').textContent = msg; }
 function showError(msg)  { show('error-screen');  document.getElementById('error-msg').textContent = msg; }
 
-function getMsal() {
-  return new msal.PublicClientApplication({
-    auth: {
-      clientId: CONFIG.clientId,
-      authority: 'https://login.microsoftonline.com/' + CONFIG.tenantId,
-      redirectUri: window.location.href.split('?')[0].split('#')[0]
-    },
-    cache: { cacheLocation: 'sessionStorage' }
-  });
-}
+const msalConfig = {
+  auth: {
+    clientId: CONFIG.clientId,
+    authority: 'https://login.microsoftonline.com/' + CONFIG.tenantId,
+    redirectUri: window.location.href.split('?')[0].split('#')[0]
+  },
+  cache: { cacheLocation: 'sessionStorage' }
+};
 
 async function init() {
-  msalInstance = getMsal();
-  await msalInstance.initialize();
-  const result = await msalInstance.handleRedirectPromise();
+  try {
+    msalInstance = await msal.PublicClientApplication.createPublicClientApplication(msalConfig);
+  } catch(e) {
+    // fallback for msal v2
+    msalInstance = new msal.PublicClientApplication(msalConfig);
+    await msalInstance.initialize();
+  }
+  let result;
+  try { result = await msalInstance.handleRedirectPromise(); } catch(e) {}
   if (result && result.accessToken) {
     await loadData(result.accessToken);
     return;
@@ -278,8 +283,12 @@ async function init() {
 }
 
 async function signIn() {
-  msalInstance = getMsal();
-  await msalInstance.initialize();
+  try {
+    msalInstance = await msal.PublicClientApplication.createPublicClientApplication(msalConfig);
+  } catch(e) {
+    msalInstance = new msal.PublicClientApplication(msalConfig);
+    await msalInstance.initialize();
+  }
   await msalInstance.loginRedirect({ scopes: ['Files.Read', 'Sites.Read.All'] });
 }
 
