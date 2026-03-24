@@ -6,405 +6,517 @@
 <title>USI EOS Scorecard 2026</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #ffffff; color: #111827; min-height: 100vh; padding: 2rem; }
-.report { max-width: 980px; margin: 0 auto; }
-#login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 1.5rem; }
-#login-screen h2 { font-size: 24px; font-weight: 700; color: #111827; }
-#login-screen p { font-size: 13px; color: #6b7280; text-align: center; max-width: 400px; line-height: 1.6; }
-#login-btn { background: #0f766e; color: #fff; border: none; border-radius: 6px; padding: 12px 32px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
-#login-btn:hover { background: #0d6460; }
-#loading-screen { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 1rem; }
-.spinner { width: 36px; height: 36px; border: 3px solid #e5e7eb; border-top-color: #0f766e; border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-#loading-screen p { font-size: 13px; color: #6b7280; }
-#error-screen { display: none; padding: 2rem; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; margin: 2rem 0; }
-#error-screen h3 { color: #dc2626; margin-bottom: 8px; }
-#error-screen p { font-size: 12px; color: #7f1d1d; line-height: 1.7; white-space: pre-wrap; }
-#dashboard { display: none; }
-.hdr { border-bottom: 1px solid #e5e7eb; padding-bottom: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; }
-.eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: #0f766e; font-weight: 600; margin-bottom: 6px; }
-.ttl { font-size: 42px; font-weight: 700; letter-spacing: -0.02em; color: #111827; line-height: 1; }
-.sub { font-size: 13px; color: #6b7280; margin-top: 6px; }
-.hdr-right { text-align: right; }
-.qbadge { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; background: #f3f4f6; border: 1px solid #e5e7eb; padding: 6px 12px; border-radius: 4px; color: #6b7280; display: block; margin-bottom: 4px; }
-.presenter { font-size: 11px; color: #9ca3af; text-align: right; }
-.signout-btn { font-size: 10px; color: #9ca3af; background: none; border: none; cursor: pointer; padding: 4px 0; font-family: inherit; }
-.signout-btn:hover { color: #6b7280; }
-.sec { margin-bottom: 2.5rem; }
-.slbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: #9ca3af; font-weight: 600; margin-bottom: 0.75rem; }
-.divider { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
-.last-updated { font-size: 10px; color: #9ca3af; text-align: right; margin-bottom: 1rem; }
-.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.kpi { background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px; padding: 1rem 1.125rem; }
-.knum { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; color: #1d4ed8; }
-.klbl { font-size: 11px; color: #6b7280; margin-top: 5px; line-height: 1.4; }
-.ktarget { font-size: 9px; color: #9ca3af; margin-top: 3px; }
-.sc-wrap { overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 10px; }
-table.sc { width: 100%; border-collapse: collapse; font-size: 11px; }
-table.sc thead th { background: #f9fafb; color: #374151; font-weight: 600; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; padding: 8px 10px; text-align: center; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
-table.sc thead th.left { text-align: left; }
-table.sc thead th.mh { background: #f0fdf4; color: #065f46; }
-table.sc tbody td { padding: 7px 10px; border-bottom: 1px solid #f3f4f6; color: #374151; white-space: nowrap; text-align: center; font-size: 11px; }
-table.sc tbody td.left { text-align: left; }
-table.sc tbody td.cat { font-weight: 700; color: #111827; font-size: 10px; background: #f9fafb; }
-.rag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; }
-.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.dot.g { background: #059669; } .dot.r { background: #dc2626; } .dot.y { background: #d97706; } .dot.n { background: #d1d5db; }
-.rag.g { color: #15803d; } .rag.r { color: #dc2626; } .rag.y { color: #d97706; } .rag.n { color: #9ca3af; }
-.badge { display: inline-block; font-size: 8px; font-weight: 700; text-transform: uppercase; padding: 1px 5px; border-radius: 2px; }
-.badge.g { background: #d1fae5; color: #065f46; } .badge.r { background: #fee2e2; color: #b91c1c; } .badge.y { background: #fef3c7; color: #d97706; } .badge.n { background: #f3f4f6; color: #9ca3af; }
-.chart-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; margin-bottom: 10px; }
-.chart-lbl { font-size: 11px; color: #4b5563; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 6px; }
-.chart-2col { display: grid; grid-template-columns: 1fr; max-width: 520px; gap: 10px; margin-bottom: 10px; }
-.legend { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-.li { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #4b5563; }
-.rocks-grid { display: grid; gap: 6px; }
-.rock-row { display: grid; grid-template-columns: 1fr 140px 90px 80px; gap: 10px; align-items: center; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 7px; padding: 10px 14px; }
-.rock-row.at-risk { border-color: #fca5a5; background: #fef2f2; }
-.rock-row.complete { border-color: #6ee7b7; background: #f0fdf4; }
-.rock-name { font-size: 11px; font-weight: 500; color: #111827; line-height: 1.4; }
-.rock-note { font-size: 9px; color: #6b7280; margin-top: 2px; }
-.rock-owner { font-size: 10px; color: #6b7280; }
-.rock-pct { font-size: 11px; font-weight: 700; text-align: right; }
-.prog-bar { height: 4px; border-radius: 2px; background: #e5e7eb; margin-top: 4px; }
-.prog-fill { height: 100%; border-radius: 2px; }
-.prog-fill.g { background: #059669; } .prog-fill.y { background: #d97706; } .prog-fill.r { background: #dc2626; }
-.funnel-grid { display: grid; grid-template-columns: 1fr; gap: 12px; max-width: 520px; }
-.funnel-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.125rem; background: #ffffff; }
-.funnel-title { font-size: 12px; font-weight: 600; color: #111827; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-.funnel-dot { width: 8px; height: 8px; border-radius: 50%; }
-.frow { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid #f3f4f6; }
-.frow:last-child { border-bottom: none; }
-.fkey { font-size: 10px; color: #6b7280; }
-.fval { font-size: 11px; font-weight: 600; color: #111827; }
-.fval.g { color: #15803d; } .fval.b { color: #1d4ed8; }
-.rag-legend { display: flex; gap: 16px; margin-bottom: 10px; font-size: 10px; color: #6b7280; flex-wrap: wrap; }
-.rl { display: flex; align-items: center; gap: 4px; }
 
-/* TechOS P&L Section */
-.tos-section { margin-bottom: 2.5rem; }
-.tos-goal-banner { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); border-radius: 10px; padding: 1.5rem; margin-bottom: 14px; color: #fff; }
-.tos-goal-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
-.tos-goal-title { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
-.tos-goal-title span { color: #34d399; }
-.tos-goal-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
-.tos-goal-pct { font-size: 32px; font-weight: 800; color: #34d399; letter-spacing: -0.02em; line-height: 1; }
-.tos-goal-pct-lbl { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 3px; }
-.tos-progress-track { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 8px; overflow: hidden; }
-.tos-progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #059669, #34d399); transition: width 0.8s ease; }
-.tos-progress-labels { display: flex; justify-content: space-between; font-size: 9px; color: rgba(255,255,255,0.3); }
-.tos-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
-.tos-kpi { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.875rem 1rem; }
-.tos-kpi.actual { border-color: #6ee7b7; background: #f0fdf4; }
-.tos-kpi.projected { border-color: #93c5fd; background: #eff6ff; border-style: dashed; }
-.tos-kpi.negative { border-color: #fca5a5; background: #fef2f2; }
-.tos-knum { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; color: #111827; }
-.tos-knum.pos { color: #15803d; }
-.tos-knum.neg { color: #dc2626; }
-.tos-knum.amb { color: #d97706; }
-.tos-klbl { font-size: 10px; color: #6b7280; margin-top: 4px; line-height: 1.3; }
-.tos-kbadge { font-size: 8px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; padding: 1px 5px; border-radius: 2px; margin-top: 4px; display: inline-block; }
-.tos-kbadge.act { background: #d1fae5; color: #065f46; }
-.tos-kbadge.proj { background: #dbeafe; color: #1e3a8a; }
-.tos-charts { display: grid; grid-template-columns: 3fr 2fr; gap: 10px; }
-.tos-table-wrap { overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 10px; }
-table.tos-tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
-table.tos-tbl thead th { background: #f9fafb; color: #374151; font-weight: 600; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; padding: 7px 12px; text-align: right; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
-table.tos-tbl thead th:first-child { text-align: left; }
-table.tos-tbl thead th.act-h { background: #f0fdf4; color: #065f46; }
-table.tos-tbl thead th.proj-h { background: #eff6ff; color: #1e40af; font-style: italic; }
-table.tos-tbl tbody td { padding: 6px 12px; border-bottom: 1px solid #f3f4f6; text-align: right; color: #374151; white-space: nowrap; }
-table.tos-tbl tbody td:first-child { text-align: left; color: #4b5563; font-size: 10px; }
-table.tos-tbl tbody td.proj-c { color: #1d4ed8; font-style: italic; background: rgba(239,246,255,0.5); }
-table.tos-tbl tbody tr.tbl-total td { font-weight: 600; color: #111827; background: #f3f4f6; border-top: 1px solid #e5e7eb; }
-table.tos-tbl tbody tr.tbl-total td.proj-c { background: #e0effe; }
-.pos-v { color: #15803d !important; }
-.neg-v { color: #dc2626 !important; }
-.amb-v { color: #d97706 !important; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0a0e1a;
+  color: #e2e4ea;
+  min-height: 100vh;
+}
+
+/* ── Scrollable full-viewport sections ── */
+.page {
+  min-height: 100vh;
+  padding: 2.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+}
+.page-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.25);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.page-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+}
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin-bottom: 0.25rem;
+  line-height: 1.1;
+}
+.page-title span { color: #34d399; }
+
+/* ── Login / Loading screens ── */
+#login-screen, #loading-screen, #error-screen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; flex-direction: column; gap: 16px;
+}
+.login-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 3rem;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+.login-logo { font-size: 10px; text-transform: uppercase; letter-spacing: 0.16em; color: #34d399; margin-bottom: 12px; }
+.login-card h2 { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.login-card p { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 2rem; line-height: 1.6; }
+.btn-login { background: #2563eb; color: #fff; border: none; border-radius: 8px; padding: 14px 32px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; letter-spacing: 0.01em; }
+.btn-login:hover { background: #1d4ed8; }
+.spinner { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #34d399; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#loading-screen p { color: rgba(255,255,255,0.4); font-size: 13px; }
+.error-card { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3); border-radius: 12px; padding: 2rem; max-width: 600px; }
+.error-card h3 { color: #f87171; font-size: 16px; margin-bottom: 8px; }
+.error-card p { color: rgba(255,255,255,0.5); font-size: 11px; line-height: 1.6; white-space: pre-wrap; }
+.btn-retry { background: none; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); border-radius: 6px; padding: 8px 20px; font-size: 12px; cursor: pointer; margin-top: 1rem; }
+
+/* ── Header bar ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,14,26,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 52px;
+}
+.topbar-left { display: flex; align-items: center; gap: 16px; }
+.topbar-brand { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: 0.01em; }
+.topbar-brand span { color: #34d399; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: #34d399; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+.topbar-period { font-size: 11px; color: rgba(255,255,255,0.35); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+#last-updated { font-size: 10px; color: rgba(255,255,255,0.25); }
+.btn-signout { background: none; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.4); border-radius: 4px; padding: 4px 12px; font-size: 10px; cursor: pointer; }
+.btn-signout:hover { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); }
+
+#dashboard { padding-top: 52px; }
+
+/* ── KPI Cards ── */
+.kpi-row { display: grid; gap: 12px; }
+.kpi-row-4 { grid-template-columns: repeat(4, 1fr); }
+.kpi-row-3 { grid-template-columns: repeat(3, 1fr); }
+.kpi-row-2 { grid-template-columns: repeat(2, 1fr); }
+.kcard {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+.kcard.green  { border-color: rgba(52,211,153,0.3);  background: rgba(52,211,153,0.06); }
+.kcard.red    { border-color: rgba(248,113,113,0.3);  background: rgba(248,113,113,0.05); }
+.kcard.amber  { border-color: rgba(251,191,36,0.3);   background: rgba(251,191,36,0.05); }
+.kcard.blue   { border-color: rgba(96,165,250,0.25);  background: rgba(96,165,250,0.05); }
+.kcard.purple { border-color: rgba(167,139,250,0.25); background: rgba(167,139,250,0.05); }
+.kval  { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; color: #fff; }
+.kval.pos { color: #34d399; }
+.kval.neg { color: #f87171; }
+.kval.amb { color: #fbbf24; }
+.kval.blu { color: #60a5fa; }
+.klbl  { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 5px; line-height: 1.3; }
+.ksub  { font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 3px; }
+.ktrend { font-size: 11px; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.ktrend.up   { color: #34d399; }
+.ktrend.down { color: #f87171; }
+.ktrend.flat { color: rgba(255,255,255,0.3); }
+
+/* ── Charts ── */
+.chart-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.chart-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.chart-grid-32 { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; }
+.cbox {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 1.125rem;
+}
+.cbox-lbl {
+  font-size: 11px; color: rgba(255,255,255,0.4);
+  margin-bottom: 10px;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;
+}
+.cleg { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.cli  { display: flex; align-items: center; gap: 4px; font-size: 10px; color: rgba(255,255,255,0.35); }
+
+/* ── Scorecard table ── */
+.sc-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.07); }
+table.sc { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.sc thead th {
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.35);
+  font-weight: 600; font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  padding: 10px 14px; text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  white-space: nowrap;
+}
+table.sc thead th.left { text-align: left; }
+table.sc thead th.act-h { color: #34d399; background: rgba(52,211,153,0.05); }
+table.sc tbody td {
+  padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.65); text-align: center; white-space: nowrap;
+}
+table.sc tbody td.left { text-align: left; }
+table.sc tbody tr.cat td { background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.dot.g { background: #34d399; } .dot.y { background: #fbbf24; } .dot.r { background: #f87171; } .dot.n { background: rgba(255,255,255,0.2); }
+.rag { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 500; }
+.rag.g { color: #34d399; } .rag.y { color: #fbbf24; } .rag.r { color: #f87171; } .rag.n { color: rgba(255,255,255,0.3); }
+.badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 3px; }
+.badge.g { background: rgba(52,211,153,0.15); color: #34d399; }
+.badge.y { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.badge.r { background: rgba(248,113,113,0.15); color: #f87171; }
+.badge.n { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+
+/* ── Rocks ── */
+.rock-row {
+  display: grid; grid-template-columns: 1fr 160px 110px 120px;
+  align-items: center; gap: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px; padding: 14px 18px; margin-bottom: 8px;
+}
+.rock-row.on-track { border-color: rgba(52,211,153,0.2); }
+.rock-row.at-risk  { border-color: rgba(251,191,36,0.25); background: rgba(251,191,36,0.04); }
+.rock-row.missed   { border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.05); }
+.rock-name  { font-size: 14px; font-weight: 500; color: #fff; line-height: 1.3; }
+.rock-note  { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 3px; }
+.rock-owner { font-size: 12px; color: rgba(255,255,255,0.4); }
+.rock-status { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+.rock-pct-val { font-size: 18px; font-weight: 800; }
+.prog-bar { height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; margin-top: 4px; }
+.prog-fill { height: 100%; border-radius: 3px; }
+.prog-fill.g { background: #34d399; } .prog-fill.y { background: #fbbf24; } .prog-fill.r { background: #f87171; }
+.rock-badges { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.rock-badge { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 5px; }
+.rock-badge.g  { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.25); }
+.rock-badge.y  { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+.rock-badge.r  { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
+
+/* ── TechOS goal banner ── */
+.tos-banner {
+  background: linear-gradient(135deg, rgba(15,23,42,0.9) 0%, rgba(30,58,95,0.9) 100%);
+  border: 1px solid rgba(52,211,153,0.2);
+  border-radius: 12px; padding: 1.5rem; margin-bottom: 16px;
+}
+.tos-banner-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.tos-banner-title { font-size: 20px; font-weight: 700; color: #fff; }
+.tos-banner-title span { color: #34d399; }
+.tos-banner-sub { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; }
+.tos-pct-big { font-size: 48px; font-weight: 800; color: #34d399; letter-spacing: -0.03em; line-height: 1; }
+.tos-pct-lbl { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 4px; }
+.tos-prog-track { height: 10px; background: rgba(255,255,255,0.08); border-radius: 5px; overflow: hidden; }
+.tos-prog-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #059669, #34d399); transition: width 1s ease; }
+.tos-prog-labels { display: flex; justify-content: space-between; font-size: 9px; color: rgba(255,255,255,0.25); margin-top: 5px; }
+
+/* ── Funnel ── */
+.funnel-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+.funnel-row:last-child { border-bottom: none; }
+.fkey { color: rgba(255,255,255,0.45); }
+.fval { font-weight: 600; color: #fff; }
+.fval.g { color: #34d399; } .fval.b { color: #60a5fa; }
+
+/* ── Divider ── */
+.divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 1.5rem 0; }
+
+/* ── Trend arrow ── */
+.trend-up   { color: #34d399; font-size: 11px; }
+.trend-down { color: #f87171; font-size: 11px; }
 </style>
 </head>
 <body>
 
-<div id="login-screen">
-  <div style="text-align:center;">
-    <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.14em;color:#0f766e;font-weight:600;margin-bottom:8px;">Universal Systems Inc.</div>
-    <h2>EOS Scorecard Dashboard</h2>
+<!-- Login -->
+<div id="login-screen" style="display:none;">
+  <div class="login-card">
+    <div class="login-logo">Universal Systems Inc.</div>
+    <h2>EOS Scorecard</h2>
+    <p>Sign in with your Microsoft 365 account to load live data directly from SharePoint.</p>
+    <button class="btn-login" onclick="signIn()">Sign in with Microsoft</button>
   </div>
-  <p>Sign in with your Microsoft 365 account to load live scorecard data directly from SharePoint.</p>
-  <button id="login-btn" onclick="signIn()">Sign in with Microsoft</button>
 </div>
 
-<div id="loading-screen">
+<!-- Loading -->
+<div id="loading-screen" style="display:none;">
   <div class="spinner"></div>
   <p id="loading-msg">Connecting to SharePoint...</p>
 </div>
 
-<div id="error-screen">
-  <h3>Could not load scorecard data</h3>
-  <p id="error-msg"></p>
+<!-- Error -->
+<div id="error-screen" style="display:none;">
+  <div class="error-card">
+    <h3>Could not load scorecard data</h3>
+    <p id="error-msg"></p>
+    <button class="btn-retry" onclick="location.reload()">Retry</button>
+  </div>
 </div>
 
-<div id="dashboard">
-<div class="report">
+<!-- Dashboard -->
+<div id="dashboard" style="display:none;">
 
-  <div class="hdr">
-    <div>
-      <div class="eyebrow">Universal Systems Inc. - Weekly Leadership Review</div>
-      <div class="ttl">EOS Scorecard</div>
-      <div class="sub">Weekly Metrics - Rocks - Annual Targets - 2026</div>
+  <!-- Fixed top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="live-dot"></div>
+      <div class="topbar-brand">USI &nbsp;<span>EOS Scorecard</span></div>
+      <div class="topbar-period" id="period-badge">2026</div>
     </div>
-    <div class="hdr-right">
-      <span class="qbadge" id="period-badge">2026</span>
-      <div class="presenter">L10 Leadership Review</div>
-      <button class="signout-btn" onclick="signOut()">Sign out</button>
-    </div>
-  </div>
-
-  <div class="last-updated" id="last-updated"></div>
-
-  <div class="sec">
-    <div class="slbl">2026 annual targets</div>
-    <div class="kpi-grid">
-      <div class="kpi"><div class="knum" id="t-total-rev">-</div><div class="klbl">Total revenue target</div><div class="ktarget" id="t-total-wk">-</div></div>
-      <div class="kpi"><div class="knum" id="t-hd-rev">-</div><div class="klbl">Hardware and Devices target</div><div class="ktarget" id="t-hd-wk">-</div></div>
-      <div class="kpi"><div class="knum" id="t-ps-rev">-</div><div class="klbl">Professional Services target</div><div class="ktarget" id="t-ps-wk">-</div></div>
-      <div class="kpi"><div class="knum" id="t-net">-</div><div class="klbl">Net profit target</div><div class="ktarget">10% net margin goal</div></div>
+    <div class="topbar-right">
+      <div id="last-updated"></div>
+      <button class="btn-signout" onclick="signOut()">Sign out</button>
     </div>
   </div>
 
-  <hr class="divider">
+  <!-- ── PAGE 1: Annual Targets ── -->
+  <div class="page">
+    <div class="page-label">Section 1 of 6 &nbsp;·&nbsp; Annual targets</div>
+    <div class="page-title">2026 Revenue <span>Targets</span></div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:1.5rem;">15% growth goal &nbsp;·&nbsp; 10% net margin &nbsp;·&nbsp; Employee and customer satisfaction</div>
+    <div class="kpi-row kpi-row-4" style="margin-bottom:16px;">
+      <div class="kcard blue">
+        <div class="kval blu" id="t-total-rev">-</div>
+        <div class="klbl">Total revenue target</div>
+        <div class="ksub" id="t-total-wk">-</div>
+      </div>
+      <div class="kcard blue">
+        <div class="kval blu" id="t-hd-rev">-</div>
+        <div class="klbl">Hardware &amp; Devices target</div>
+        <div class="ksub" id="t-hd-wk">-</div>
+      </div>
+      <div class="kcard green">
+        <div class="kval pos" id="t-ps-rev">-</div>
+        <div class="klbl">Professional Services target</div>
+        <div class="ksub" id="t-ps-wk">-</div>
+      </div>
+      <div class="kcard purple">
+        <div class="kval" style="color:#c4b5fd;" id="t-net">-</div>
+        <div class="klbl">Net profit target</div>
+        <div class="ksub">10% net margin goal</div>
+      </div>
+    </div>
+    <!-- Weekly revenue trend KPIs -->
+    <div class="kpi-row kpi-row-4">
+      <div class="kcard">
+        <div class="kval" id="hd-w1-val">-</div>
+        <div class="klbl" id="hd-w1-lbl">H&amp;D Week 1</div>
+        <div class="ktrend" id="hd-w1-trend"></div>
+      </div>
+      <div class="kcard">
+        <div class="kval" id="hd-w2-val">-</div>
+        <div class="klbl" id="hd-w2-lbl">H&amp;D Week 2</div>
+        <div class="ktrend" id="hd-w2-trend"></div>
+      </div>
+      <div class="kcard">
+        <div class="kval" id="ps-w1-val">-</div>
+        <div class="klbl" id="ps-w1-lbl">PS Week 1</div>
+        <div class="ktrend" id="ps-w1-trend"></div>
+      </div>
+      <div class="kcard">
+        <div class="kval" id="ps-w2-val">-</div>
+        <div class="klbl" id="ps-w2-lbl">PS Week 2</div>
+        <div class="ktrend" id="ps-w2-trend"></div>
+      </div>
+    </div>
+  </div>
 
-  <div class="sec">
-    <div class="slbl">Weekly scorecard</div>
-    <div class="rag-legend">
-      <div class="rl"><span class="dot g"></span> On target</div>
-      <div class="rl"><span class="dot y"></span> Within 90% of target</div>
-      <div class="rl"><span class="dot r"></span> Below target</div>
-      <div class="rl"><span class="dot n"></span> No data</div>
+  <!-- ── PAGE 2: Revenue Trend Charts ── -->
+  <div class="page">
+    <div class="page-label">Section 2 of 6 &nbsp;·&nbsp; Revenue trends</div>
+    <div class="page-title">Weekly Detail &amp; <span>Monthly Trend</span></div>
+    <div class="chart-grid-2" style="margin-top:1.25rem;">
+      <div class="cbox">
+        <div class="cbox-lbl">
+          Hardware &amp; Devices — weekly actuals vs target
+          <div class="cleg">
+            <div class="cli"><span style="width:8px;height:8px;border-radius:2px;background:#2563eb;display:inline-block;"></span>Actual</div>
+            <div class="cli"><span style="width:14px;border-top:2px dashed rgba(248,113,113,0.8);display:inline-block;"></span>Target</div>
+          </div>
+        </div>
+        <div style="position:relative;height:220px;"><canvas id="hdChart"></canvas></div>
+      </div>
+      <div class="cbox">
+        <div class="cbox-lbl">
+          Professional Services — weekly actuals vs target
+          <div class="cleg">
+            <div class="cli"><span style="width:8px;height:8px;border-radius:2px;background:#059669;display:inline-block;"></span>Actual</div>
+            <div class="cli"><span style="width:14px;border-top:2px dashed rgba(248,113,113,0.8);display:inline-block;"></span>Target</div>
+          </div>
+        </div>
+        <div style="position:relative;height:220px;"><canvas id="psChart"></canvas></div>
+      </div>
+    </div>
+    <div class="chart-grid-2" style="margin-top:16px;">
+      <div class="cbox">
+        <div class="cbox-lbl">H&amp;D monthly invoicing trend — current year</div>
+        <div style="position:relative;height:180px;"><canvas id="hdMonthChart"></canvas></div>
+      </div>
+      <div class="cbox">
+        <div class="cbox-lbl">PS monthly invoicing trend — current year</div>
+        <div style="position:relative;height:180px;"><canvas id="psMonthChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PAGE 3: Weekly Scorecard ── -->
+  <div class="page">
+    <div class="page-label">Section 3 of 6 &nbsp;·&nbsp; Weekly scorecard</div>
+    <div class="page-title">Weekly <span>Metrics</span></div>
+    <div style="display:flex;gap:16px;margin-bottom:1rem;font-size:11px;color:rgba(255,255,255,0.3);">
+      <span style="display:flex;align-items:center;gap:5px;"><span class="dot g"></span>On target</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span class="dot y"></span>Within 90%</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span class="dot r"></span>Below target</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span class="dot n"></span>No data</span>
     </div>
     <div class="sc-wrap">
       <table class="sc">
         <thead>
           <tr>
             <th class="left" style="width:120px;">Category</th>
-            <th class="left" style="width:160px;">Measure</th>
-            <th class="left" style="width:100px;">Target</th>
-            <th class="left" style="width:80px;">Owner</th>
-            <th class="mh" id="wk1-hdr">Week A</th>
-            <th class="mh" id="wk2-hdr">Week B</th>
-            <th class="mh">Month total</th>
+            <th class="left" style="width:180px;">Measure</th>
+            <th class="left">Target</th>
+            <th class="left">Owner</th>
+            <th class="act-h" id="wk1-hdr">Week A</th>
+            <th class="act-h" id="wk2-hdr">Week B</th>
+            <th class="act-h">Month total</th>
           </tr>
         </thead>
         <tbody id="scorecard-body">
-          <tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:2rem;">Loading...</td></tr>
+          <tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,0.2);padding:2rem;">Loading...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <hr class="divider">
-
-  <div class="sec">
-    <div class="slbl">Revenue trend - actuals vs weekly target</div>
-    <div class="chart-2col">
-      <div class="chart-box" style="margin-bottom:0;">
-        <div class="chart-lbl">Hardware and Devices invoicing
-          <div class="legend">
-            <div class="li"><span style="width:8px;height:8px;border-radius:2px;background:#2563eb;display:inline-block;"></span>Actual</div>
-            <div class="li"><span style="width:14px;border-top:2px dashed #dc2626;display:inline-block;"></span>Target</div>
-          </div>
-        </div>
-        <div style="position:relative;height:190px;"><canvas id="hdChart"></canvas></div>
-      </div>
-      <div class="chart-box" style="margin-bottom:0;">
-        <div class="chart-lbl">Professional Services invoicing
-          <div class="legend">
-            <div class="li"><span style="width:8px;height:8px;border-radius:2px;background:#059669;display:inline-block;"></span>Actual</div>
-            <div class="li"><span style="width:14px;border-top:2px dashed #dc2626;display:inline-block;"></span>Target</div>
-          </div>
-        </div>
-        <div style="position:relative;height:190px;"><canvas id="psChart"></canvas></div>
-      </div>
+  <!-- ── PAGE 4: Rocks ── -->
+  <div class="page">
+    <div class="page-label">Section 4 of 6 &nbsp;·&nbsp; Q1 2026 rocks</div>
+    <div class="page-title">Q1 <span>Rocks</span> &nbsp;·&nbsp; Due March 31, 2026</div>
+    <div class="rock-badges" style="margin-top:1rem;">
+      <div class="rock-badge g" id="rocks-on-track">- On Track</div>
+      <div class="rock-badge y" id="rocks-at-risk">- At Risk</div>
+      <div class="rock-badge r" id="rocks-missed">- Missed</div>
+    </div>
+    <div id="rocks-grid">
+      <div style="color:rgba(255,255,255,0.2);padding:2rem;text-align:center;">Loading...</div>
     </div>
   </div>
 
-  <hr class="divider">
+  <!-- ── PAGE 5: TechOS P&L ── -->
+  <div class="page">
+    <div class="page-label">Section 5 of 6 &nbsp;·&nbsp; TechOS division</div>
+    <div class="page-title">TechOS <span>P&amp;L</span> &nbsp;·&nbsp; Path to 20% of USI Revenue</div>
 
-  <div class="sec">
-    <div class="slbl">Q1 2026 rocks - due March 31, 2026</div>
-    <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
-      <div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#065f46;" id="rocks-on-track">- On Track</div>
-      <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#d97706;" id="rocks-at-risk">- At Risk</div>
-      <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#b91c1c;" id="rocks-missed" style="display:none;">- Missed</div>
-    </div>
-    <div class="rocks-grid" id="rocks-grid"><div style="text-align:center;color:#9ca3af;padding:2rem;">Loading...</div></div>
-  </div>
-
-  <hr class="divider">
-
-  <div class="sec">
-    <div class="slbl">2026 Hardware &amp; Devices sales funnel</div>
-    <div class="funnel-grid">
-      <div class="funnel-card">
-        <div class="funnel-title"><div class="funnel-dot" style="background:#2563eb;"></div>Hardware and Devices</div>
-        <div class="frow"><span class="fkey">2026 target</span><span class="fval b" id="f-hd-target">-</span></div>
-        <div class="frow"><span class="fkey">2025 actual revenue</span><span class="fval" id="f-hd-2025">-</span></div>
-        <div class="frow"><span class="fkey">Go-get number</span><span class="fval b" id="f-hd-goget">-</span></div>
-        <div class="frow"><span class="fkey">New customers needed</span><span class="fval" id="f-hd-cust">-</span></div>
-        <div class="frow"><span class="fkey">Opportunities needed (40% win rate)</span><span class="fval" id="f-hd-opps">-</span></div>
-        <div class="frow"><span class="fkey">Weekly leads needed</span><span class="fval b" id="f-hd-leads">-</span></div>
-      </div>
-      
-    </div>
-  </div>
-
-  <hr class="divider">
-
-  <!-- TechOS P&L Section -->
-  <div class="tos-section">
-    <div class="slbl">TechOS division &nbsp;·&nbsp; monthly P&amp;L &nbsp;·&nbsp; EOS VTO goal: 20% of total USI revenue</div>
-
-    <!-- VTO Goal Banner -->
-    <div class="tos-goal-banner">
-      <div class="tos-goal-top">
+    <div class="tos-banner" style="margin-top:1rem;">
+      <div class="tos-banner-top">
         <div>
-          <div class="tos-goal-title">TechOS &nbsp;·&nbsp; <span>Path to 20%</span></div>
-          <div class="tos-goal-sub">EOS VTO target: TechOS becomes no less than 20% of total USI revenue ($19.3M). Monthly invoicing cadence.</div>
+          <div class="tos-banner-title">EOS VTO Goal: <span>20% of Total USI Revenue</span></div>
+          <div class="tos-banner-sub">$19.3M total USI target &nbsp;·&nbsp; TechOS must reach $3.87M annually &nbsp;·&nbsp; Monthly invoicing cadence</div>
         </div>
         <div style="text-align:right;">
-          <div class="tos-goal-pct" id="tos-pct-actual">-</div>
-          <div class="tos-goal-pct-lbl">Current % of USI revenue (YTD)</div>
+          <div class="tos-pct-big" id="tos-pct-actual">-</div>
+          <div class="tos-pct-lbl">Annualized % of USI revenue (YTD)</div>
         </div>
       </div>
-      <div class="tos-progress-track">
-        <div class="tos-progress-fill" id="tos-progress-bar" style="width:0%;"></div>
+      <div class="tos-prog-track">
+        <div class="tos-prog-fill" id="tos-progress-bar" style="width:0%;"></div>
       </div>
-      <div class="tos-progress-labels">
+      <div class="tos-prog-labels">
         <span>0%</span>
-        <span id="tos-progress-marker" style="color:rgba(255,255,255,0.6);">▲ Current</span>
-        <span style="color:#34d399;font-weight:600;">20% goal</span>
+        <span id="tos-progress-marker" style="color:rgba(52,211,153,0.6);">▲ Current</span>
+        <span style="color:#34d399;font-weight:700;">20% goal</span>
       </div>
     </div>
 
-    <!-- Monthly KPI Cards -->
-    <div class="tos-kpis">
-      <div class="tos-kpi actual" id="tos-jan-card">
-        <div class="tos-knum" id="tos-jan-rev">-</div>
-        <div class="tos-klbl">January revenue</div>
-        <div class="tos-knum" id="tos-jan-ni" style="font-size:14px;margin-top:6px;">-</div>
-        <div class="tos-klbl">Net income (w/ overhead)</div>
-        <span class="tos-kbadge act">Actual</span>
-      </div>
-      <div class="tos-kpi actual" id="tos-feb-card">
-        <div class="tos-knum" id="tos-feb-rev">-</div>
-        <div class="tos-klbl">February revenue</div>
-        <div class="tos-knum" id="tos-feb-ni" style="font-size:14px;margin-top:6px;">-</div>
-        <div class="tos-klbl">Net income (w/ overhead)</div>
-        <span class="tos-kbadge act">Actual</span>
-      </div>
-      <div class="tos-kpi actual" id="tos-mar-card">
-        <div class="tos-knum" id="tos-mar-rev">-</div>
-        <div class="tos-klbl">March revenue</div>
-        <div class="tos-knum" id="tos-mar-ni" style="font-size:14px;margin-top:6px;">-</div>
-        <div class="tos-klbl">Net income (w/ overhead)</div>
-        <span class="tos-kbadge act">Actual</span>
-      </div>
-      <div class="tos-kpi projected">
-        <div class="tos-knum pos" id="tos-q2-ni">-</div>
-        <div class="tos-klbl">Q2 projected NI total</div>
-        <div class="tos-knum" id="tos-may-ni" style="font-size:13px;margin-top:6px;color:#15803d;">-</div>
-        <div class="tos-klbl">May - first profitable month</div>
-        <span class="tos-kbadge proj">Projected</span>
-      </div>
-    </div>
-
-    <!-- Charts -->
-    <div class="tos-charts">
-      <div class="chart-box" style="margin-bottom:0;">
-        <div class="chart-lbl">
-          TechOS revenue &amp; net income - monthly actuals + projections
-          <div class="legend">
-            <div class="li"><span style="width:8px;height:8px;border-radius:2px;background:#059669;display:inline-block;"></span>Revenue (actual)</div>
-            <div class="li"><span style="width:8px;height:8px;border-radius:2px;background:rgba(5,150,105,0.25);border:1px dashed #059669;display:inline-block;"></span>Revenue (projected)</div>
-            <div class="li"><span style="width:14px;border-top:2px solid #1d4ed8;display:inline-block;"></span>NI actual</div>
-            <div class="li"><span style="width:14px;border-top:2px dashed #1d4ed8;display:inline-block;"></span>NI projected</div>
+    <div class="chart-grid-32" style="margin-bottom:14px;">
+      <div class="cbox">
+        <div class="cbox-lbl">
+          TechOS revenue &amp; NI — actuals + projections (Jan–Jun)
+          <div class="cleg">
+            <div class="cli"><span style="width:8px;height:8px;border-radius:2px;background:rgba(52,211,153,0.6);display:inline-block;"></span>Rev actual</div>
+            <div class="cli"><span style="width:8px;height:8px;border-radius:2px;background:rgba(52,211,153,0.2);border:1px dashed #34d399;display:inline-block;"></span>Rev proj</div>
+            <div class="cli"><span style="width:14px;border-top:2px solid #60a5fa;display:inline-block;"></span>NI actual</div>
+            <div class="cli"><span style="width:14px;border-top:2px dashed #60a5fa;display:inline-block;"></span>NI proj</div>
           </div>
         </div>
-        <div style="position:relative;height:220px;"><canvas id="tosRevChart"></canvas></div>
+        <div style="position:relative;height:200px;"><canvas id="tosRevChart"></canvas></div>
       </div>
-      <div class="chart-box" style="margin-bottom:0;">
-        <div class="chart-lbl">TechOS % of total USI revenue - path to 20% goal</div>
-        <div style="position:relative;height:220px;"><canvas id="tosPctChart"></canvas></div>
+      <div class="cbox">
+        <div class="cbox-lbl">TechOS % of monthly USI revenue target</div>
+        <div style="position:relative;height:200px;"><canvas id="tosPctChart"></canvas></div>
       </div>
     </div>
 
-    <!-- P&L Table -->
-    <div class="tos-table-wrap">
-      <table class="tos-tbl">
-        <thead>
-          <tr>
-            <th style="width:180px;text-align:left;">Line item</th>
-            <th class="act-h">January</th>
-            <th class="act-h">February</th>
-            <th class="act-h">March</th>
-            <th class="proj-h">April ▸</th>
-            <th class="proj-h">May ▸</th>
-            <th class="proj-h">June ▸</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Total revenue</td>
-            <td class="act-h" id="tt-jan-rev">-</td><td class="act-h" id="tt-feb-rev">-</td><td class="act-h" id="tt-mar-rev">-</td>
-            <td class="proj-c">—</td><td class="proj-c">—</td><td class="proj-c">—</td>
-          </tr>
-          <tr><td>Gross profit</td>
-            <td id="tt-jan-gp">-</td><td id="tt-feb-gp">-</td><td id="tt-mar-gp">-</td>
-            <td class="proj-c">—</td><td class="proj-c">—</td><td class="proj-c">—</td>
-          </tr>
-          <tr><td>Total expenses</td>
-            <td class="neg-v" id="tt-jan-exp">-</td><td class="neg-v" id="tt-feb-exp">-</td><td class="neg-v" id="tt-mar-exp">-</td>
-            <td class="proj-c">—</td><td class="proj-c">—</td><td class="proj-c">—</td>
-          </tr>
-          <tr><td>10% USI overhead</td>
-            <td class="neg-v" id="tt-jan-oh">-</td><td class="neg-v" id="tt-feb-oh">-</td><td class="neg-v" id="tt-mar-oh">-</td>
-            <td class="proj-c">—</td><td class="proj-c">—</td><td class="proj-c">—</td>
-          </tr>
-          <tr class="tbl-total">
-            <td>Net income (w/ overhead)</td>
-            <td id="tt-jan-ni">-</td><td id="tt-feb-ni">-</td><td id="tt-mar-ni">-</td>
-            <td class="proj-c" id="tt-apr-ni">-</td>
-            <td class="proj-c pos-v" id="tt-may-ni">-</td>
-            <td class="proj-c pos-v" id="tt-jun-ni">-</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="kpi-row kpi-row-4">
+      <div class="kcard">
+        <div class="kval" id="tos-jan-rev">-</div>
+        <div class="klbl">January revenue</div>
+        <div class="kval" style="font-size:18px;margin-top:8px;" id="tos-jan-ni">-</div>
+        <div class="ksub">Net income (w/ overhead)</div>
+      </div>
+      <div class="kcard">
+        <div class="kval" id="tos-feb-rev">-</div>
+        <div class="klbl">February revenue</div>
+        <div class="kval" style="font-size:18px;margin-top:8px;" id="tos-feb-ni">-</div>
+        <div class="ksub">Net income (w/ overhead)</div>
+      </div>
+      <div class="kcard">
+        <div class="kval" id="tos-mar-rev">-</div>
+        <div class="klbl">March revenue</div>
+        <div class="kval" style="font-size:18px;margin-top:8px;" id="tos-mar-ni">-</div>
+        <div class="ksub">Net income (w/ overhead)</div>
+      </div>
+      <div class="kcard green" style="border-style:dashed;">
+        <div class="kval pos" id="tos-q2-ni">-</div>
+        <div class="klbl">Q2 projected NI (signed contracts)</div>
+        <div class="kval pos" style="font-size:18px;margin-top:8px;" id="tos-may-ni">-</div>
+        <div class="ksub">May — first profitable month</div>
+      </div>
     </div>
   </div>
 
+  <!-- ── PAGE 6: Funnel ── -->
+  <div class="page">
+    <div class="page-label">Section 6 of 6 &nbsp;·&nbsp; Sales funnel</div>
+    <div class="page-title">Hardware &amp; Devices <span>Funnel Targets</span></div>
+    <div style="max-width:560px;margin-top:1.5rem;">
+      <div class="kpi-row kpi-row-2" style="margin-bottom:20px;">
+        <div class="kcard blue">
+          <div class="kval blu" id="f-hd-target">-</div>
+          <div class="klbl">2026 target</div>
+        </div>
+        <div class="kcard">
+          <div class="kval blu" id="f-hd-goget">-</div>
+          <div class="klbl">Go-get number</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:1.25rem;">
+        <div class="funnel-row"><span class="fkey">2025 actual revenue</span><span class="fval" id="f-hd-2025">-</span></div>
+        <div class="funnel-row"><span class="fkey">New customers needed</span><span class="fval b" id="f-hd-cust">-</span></div>
+        <div class="funnel-row"><span class="fkey">Opportunities needed (40% win rate)</span><span class="fval b" id="f-hd-opps">-</span></div>
+        <div class="funnel-row"><span class="fkey">Weekly leads needed</span><span class="fval g" id="f-hd-leads">-</span></div>
+      </div>
+    </div>
+  </div>
 
-</div>
-</div>
+</div><!-- end dashboard -->
 
 <script src="https://unpkg.com/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-
 <script>
+
+// ── CONFIG ──
 const CONFIG = {
   clientId: '3565db63-2a61-4eaf-a84e-7577e5369a5c',
-  tenantId: '53e2c3bd-d5d4-443d-bd75-e93b8d6a32c1',
-  shareId:  'u!aHR0cHM6Ly91bml2ZXJzYWxzeXN0ZW1zaW5jMTAwLnNoYXJlcG9pbnQuY29tLzp4Oi9zL0wxMC9JUURSZ3B4VTctZ2lSSUN3Nkl2YmJGVzNBYmgxU1FCOHpYbGxJc0ExTWN1d19pMD9lPW11QmFtVQ'
+  tenantId: '53e2c3bd-d5d4-443d-bd75-e93b8d6a32c1'
 };
-
-let msalInstance, hdChartObj, psChartObj;
-
-function show(id) {
-  ['login-screen','loading-screen','error-screen','dashboard'].forEach(s => {
-    const el = document.getElementById(s);
-    el.style.display = (s === id) ? (s==='dashboard'||s==='error-screen' ? 'block' : 'flex') : 'none';
-  });
-}
-function setLoading(msg) { show('loading-screen'); document.getElementById('loading-msg').textContent = msg; }
-function showError(msg)  { show('error-screen');  document.getElementById('error-msg').textContent = msg; }
 
 const msalConfig = {
   auth: {
@@ -415,24 +527,38 @@ const msalConfig = {
   cache: { cacheLocation: 'sessionStorage' }
 };
 
+let msalInstance, hdChartObj, psChartObj;
+
+// ── Chart defaults for dark theme ──
+Chart.defaults.color = 'rgba(255,255,255,0.4)';
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+Chart.defaults.font.size = 11;
+const gc = 'rgba(255,255,255,0.06)';
+const lc = 'rgba(255,255,255,0.35)';
+
+function show(id) {
+  ['login-screen','loading-screen','error-screen','dashboard'].forEach(s => {
+    const el = document.getElementById(s);
+    if (!el) return;
+    el.style.display = s === id ? (s === 'dashboard' ? 'block' : 'flex') : 'none';
+  });
+}
+function setLoading(msg) { show('loading-screen'); document.getElementById('loading-msg').textContent = msg; }
+function showError(msg)   { show('error-screen');  document.getElementById('error-msg').textContent = msg; }
+
 async function init() {
   msalInstance = new msal.PublicClientApplication(msalConfig);
   await msalInstance.initialize();
   let result;
   try { result = await msalInstance.handleRedirectPromise(); } catch(e) {}
-  if (result && result.accessToken) {
-    await loadData(result.accessToken);
-    return;
-  }
+  if (result && result.accessToken) { await loadData(result.accessToken); return; }
   const accounts = msalInstance.getAllAccounts();
   if (accounts.length > 0) {
     try {
       const r = await msalInstance.acquireTokenSilent({ scopes: ['Files.Read', 'Sites.Read.All'], account: accounts[0] });
       await loadData(r.accessToken);
     } catch { show('login-screen'); }
-  } else {
-    show('login-screen');
-  }
+  } else { show('login-screen'); }
 }
 
 async function signIn() {
@@ -440,11 +566,7 @@ async function signIn() {
   await msalInstance.initialize();
   await msalInstance.loginRedirect({ scopes: ['Files.Read', 'Sites.Read.All'] });
 }
-
-function signOut() {
-  if (msalInstance) msalInstance.logoutRedirect();
-  show('login-screen');
-}
+function signOut() { if (msalInstance) msalInstance.logoutRedirect(); show('login-screen'); }
 
 async function api(token, path) {
   const r = await fetch('https://graph.microsoft.com/v1.0' + path, { headers: { Authorization: 'Bearer ' + token } });
@@ -455,13 +577,12 @@ async function api(token, path) {
 async function loadData(token) {
   try {
     setLoading('Reading scorecard from SharePoint...');
-    // Get site, then drive, then file by path
-    const site = await api(token, '/sites/universalsystemsinc100.sharepoint.com:/sites/L10');
+    const site  = await api(token, '/sites/universalsystemsinc100.sharepoint.com:/sites/L10');
     const drive = await api(token, '/sites/' + site.id + '/drive');
     const search = await api(token, '/drives/' + drive.id + "/root/search(q='EOS Scorecard')");
     const file = search.value.find(f => f.name === 'EOS Scorecard Data Sheet.xlsx') || search.value[0];
-    if (!file) throw new Error('EOS Scorecard Data Sheet.xlsx not found in L10. Check the file exists in Documents.');
-    const base  = '/drives/' + drive.id + '/items/' + file.id + '/workbook';
+    if (!file) throw new Error('EOS Scorecard Data Sheet.xlsx not found in L10.');
+    const base = '/drives/' + drive.id + '/items/' + file.id + '/workbook';
     const [sc, rocks, funnel] = await Promise.all([
       api(token, base + "/worksheets('EOS%20Scorecard%20Tracking')/usedRange"),
       api(token, base + "/worksheets('Rocks%20ScoreCard')/usedRange"),
@@ -473,139 +594,263 @@ async function loadData(token) {
     renderRocks(rocks.values);
     renderFunnel(funnel.values);
 
-    // Load TechOS P&L from Finance site
+    // TechOS P&L from Finance site
     try {
       setLoading('Loading TechOS financial data...');
       const finSite  = await api(token, '/sites/universalsystemsinc100.sharepoint.com:/sites/Finance');
       const finDrive = await api(token, '/sites/' + finSite.id + '/drive');
       const finSearch = await api(token, '/drives/' + finDrive.id + "/root/search(q='TechOS PL')");
       const finFile   = finSearch.value.find(f => f.name === 'TechOS PL updated.xlsx') || finSearch.value[0];
-      if (!finFile) throw new Error('TechOS PL updated.xlsx not found in Finance drive.');
+      if (!finFile) throw new Error('TechOS PL updated.xlsx not found.');
       const tosBase  = '/drives/' + finDrive.id + '/items/' + finFile.id + '/workbook';
       const tosSheet = await api(token, tosBase + "/worksheets('Sheet1')/usedRange");
       renderTechOS(tosSheet.values);
     } catch(e) {
-      // TechOS data failed — show section with error note but don't block main dashboard
-      console.warn('TechOS data load failed:', e.message);
+      console.warn('TechOS data failed:', e.message);
       renderTechOS(null);
     }
 
-    document.getElementById('last-updated').textContent = 'Live data loaded: ' + new Date().toLocaleString();
+    document.getElementById('last-updated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
     show('dashboard');
   } catch(e) {
-    showError('Could not read Excel data.\n\n' + e.message + '\n\nIf you see 403: an admin needs to grant consent in Azure portal.\nIf you see 404: the file sharing link may have changed.');
+    showError('Could not load data.\n\n' + e.message + '\n\nIf 403: admin consent needed in Azure.\nIf 404: file may have moved.');
   }
 }
 
-const f$ = v => '$' + Number(v).toLocaleString('en-US',{maximumFractionDigits:0});
-const fK = v => '$' + Math.round(v/1000) + 'K';
-const gc = 'rgba(0,0,0,0.06)', lc = '#374151';
+// ── Helpers ──
+const f$ = v => !v && v !== 0 ? '-' : '$' + Number(v).toLocaleString('en-US', {maximumFractionDigits:0});
+const fK = v => !v && v !== 0 ? '-' : '$' + Math.round(v/1000) + 'K';
+const fM = v => !v && v !== 0 ? '-' : '$' + (v/1e6).toFixed(2) + 'M';
 
+function trend(curr, prev, id) {
+  const el = document.getElementById(id);
+  if (!el || !curr || !prev || prev === 0) return;
+  const pct = ((curr - prev) / prev * 100).toFixed(1);
+  const up = curr >= prev;
+  el.className = 'ktrend ' + (up ? 'up' : 'down');
+  el.innerHTML = (up ? '▲' : '▼') + ' ' + Math.abs(pct) + '% vs prior week';
+}
+
+function ragCls(actual, target, lower) {
+  if (actual == null || !target) return 'n';
+  if (lower) return actual <= target ? 'g' : actual <= target * 1.2 ? 'y' : 'r';
+  const r = actual / target; return r >= 1 ? 'g' : r >= 0.9 ? 'y' : 'r';
+}
+
+// ── Render annual targets + weekly KPIs ──
 function renderTargets(v) {
-  const s = (id,val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
-  s('t-total-rev', f$(v[11]?.[1]||19343037));
-  s('t-total-wk',  f$(v[11]?.[2]||371981) + ' weekly');
-  s('t-hd-rev',    f$(v[9]?.[1]||17408733));
-  s('t-hd-wk',     f$(v[9]?.[2]||334783) + ' weekly - Rachel W');
-  s('t-ps-rev',    f$(v[10]?.[1]||1934304));
-  s('t-ps-wk',     f$(v[10]?.[2]||37198) + ' weekly - Chris');
-  s('t-net',       f$(v[12]?.[1]||1934304));
-  const month = v[14]?.[4]||'';
-  document.getElementById('period-badge').textContent = '2026' + (month ? ' - ' + month : '');
+  const s = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  s('t-total-rev', f$(v[11]?.[1]));
+  s('t-total-wk',  fK(v[11]?.[2]) + ' weekly target');
+  s('t-hd-rev',    f$(v[9]?.[1]));
+  s('t-hd-wk',     fK(v[9]?.[2]) + ' weekly · Rachel W');
+  s('t-ps-rev',    f$(v[10]?.[1]));
+  s('t-ps-wk',     fK(v[10]?.[2]) + ' weekly · Chris');
+  s('t-net',       f$(v[12]?.[1]));
+
+  const month = v[14]?.[4] || '';
+  document.getElementById('period-badge').textContent = '2026' + (month ? ' · ' + month : '');
+
+  const hdr = v[15] || [];
+  const w1l = hdr[4] || 'W10', w2l = hdr[5] || 'W11';
+  const hd = v[16] || [], ps = v[20] || [];
+  const hdT = hd[2], psT = ps[2];
+  const hdW1 = hd[4], hdW2 = hd[5], psW1 = ps[4], psW2 = ps[5];
+
+  // Weekly KPI cards with color
+  const setKPI = (idVal, idLbl, idTrend, val, lbl, target, prevVal) => {
+    const elV = document.getElementById(idVal);
+    const elL = document.getElementById(idLbl);
+    if (elV) {
+      elV.textContent = val > 999 ? fK(val) : (val || '-');
+      const cls = ragCls(val, target, false);
+      elV.className = 'kval ' + (cls === 'g' ? 'pos' : cls === 'r' ? 'neg' : cls === 'y' ? 'amb' : '');
+    }
+    if (elL) elL.textContent = lbl;
+    if (idTrend) trend(val, prevVal, idTrend);
+  };
+
+  setKPI('hd-w1-val','hd-w1-lbl','hd-w1-trend', hdW1, 'H&D ' + w1l + ' invoicing', hdT, null);
+  setKPI('hd-w2-val','hd-w2-lbl','hd-w2-trend', hdW2, 'H&D ' + w2l + ' invoicing', hdT, hdW1);
+  setKPI('ps-w1-val','ps-w1-lbl','ps-w1-trend', psW1, 'PS ' + w1l + ' invoicing', psT, null);
+  setKPI('ps-w2-val','ps-w2-lbl','ps-w2-trend', psW2, 'PS ' + w2l + ' invoicing', psT, psW1);
 }
 
-function rag(actual, target, lower) {
-  if (actual==null||!target) return 'n';
-  if (lower) return actual<=target?'g':actual<=target*1.2?'y':'r';
-  const r=actual/target; return r>=1?'g':r>=0.9?'y':'r';
-}
-
+// ── Render scorecard table ──
 function renderScorecard(v) {
-  const w1l=v[15]?.[4]||'W10', w2l=v[15]?.[5]||'W11';
-  document.getElementById('wk1-hdr').textContent=w1l;
-  document.getElementById('wk2-hdr').textContent=w2l;
-  const lowerIsBetter = s => ['sla','return','strike','breach'].some(x=>s.toLowerCase().includes(x));
-  let html='', lastCat='';
-  for (let i=16; i<v.length&&i<=29; i++) {
-    const r=v[i]; if(!r) continue;
-    const cat=(r[0]||'').toString().trim(), meas=(r[1]||'').toString().trim();
-    const tgt=r[2], owner=(r[3]||'').toString().trim();
-    const w1=r[4], w2=r[5], ms=r[8];
+  const w1l = v[15]?.[4] || 'W10', w2l = v[15]?.[5] || 'W11';
+  document.getElementById('wk1-hdr').textContent = w1l;
+  document.getElementById('wk2-hdr').textContent = w2l;
+  const lowerIsBetter = s => ['sla','return','strike','breach'].some(x => s.toLowerCase().includes(x));
+  let html = '', lastCat = '';
+  for (let i = 16; i < v.length && i <= 29; i++) {
+    const r = v[i]; if (!r) continue;
+    const cat = (r[0] || '').toString().trim(), meas = (r[1] || '').toString().trim();
+    const tgt = r[2], owner = (r[3] || '').toString().trim();
+    const w1 = r[4], w2 = r[5], ms = r[8];
     if (!meas) continue;
-    if (cat&&cat!==lastCat) { html+=`<tr><td colspan="7" class="left cat">${cat}</td></tr>`; lastCat=cat; }
-    const lib=lowerIsBetter(meas);
-    const tgtD=tgt!=null?(tgt>1000?fK(tgt):Number(tgt).toFixed(tgt<10?1:0)):'-';
-    const w1d=w1!=null?(w1>999?f$(w1):w1):'-';
-    const w2d=w2!=null?(w2>999?f$(w2):w2):'-';
-    const msd=ms!=null?(ms>999?f$(ms):ms):'-';
-    const r1=rag(w1,tgt,lib), r2=rag(w2,tgt,lib), rm=rag(ms,tgt*2,lib);
-    html+=`<tr>
-      <td class="left" style="padding-left:20px;color:#9ca3af;font-size:10px;"></td>
-      <td class="left" style="color:#4b5563;font-size:10px;">${meas}</td>
-      <td class="left" style="color:#9ca3af;font-size:10px;">${tgtD}</td>
-      <td class="left" style="color:#6b7280;font-size:10px;">${owner}</td>
+    if (cat && cat !== lastCat) {
+      html += `<tr class="cat"><td colspan="7" class="left" style="padding-left:14px;">${cat}</td></tr>`;
+      lastCat = cat;
+    }
+    const lib = lowerIsBetter(meas);
+    const tgtD = tgt != null ? (tgt > 1000 ? fK(tgt) : Number(tgt).toFixed(tgt < 10 ? 1 : 0)) : '-';
+    const w1d = w1 != null ? (w1 > 999 ? fK(w1) : w1) : '-';
+    const w2d = w2 != null ? (w2 > 999 ? fK(w2) : w2) : '-';
+    const msd = ms != null ? (ms > 999 ? fK(ms) : ms) : '-';
+    const r1 = ragCls(w1, tgt, lib), r2 = ragCls(w2, tgt, lib), rm = ragCls(ms, tgt * 2, lib);
+    // Trend arrow between weeks
+    const trendArrow = w1 != null && w2 != null
+      ? (w2 > w1 ? '<span class="trend-up">▲</span>' : w2 < w1 ? '<span class="trend-down">▼</span>' : '<span style="color:rgba(255,255,255,0.2);">—</span>')
+      : '';
+    html += `<tr>
+      <td class="left" style="padding-left:20px;color:rgba(255,255,255,0.25);font-size:11px;"></td>
+      <td class="left" style="color:rgba(255,255,255,0.7);font-size:13px;">${meas}</td>
+      <td class="left" style="color:rgba(255,255,255,0.3);font-size:11px;">${tgtD}</td>
+      <td class="left" style="color:rgba(255,255,255,0.35);font-size:11px;">${owner}</td>
       <td><span class="rag ${r1}"><span class="dot ${r1}"></span>${w1d}</span></td>
-      <td><span class="rag ${r2}"><span class="dot ${r2}"></span>${w2d}</span></td>
+      <td><span class="rag ${r2}"><span class="dot ${r2}"></span>${w2d}</span> ${trendArrow}</td>
       <td><span class="badge ${rm}">${msd}</span></td>
     </tr>`;
   }
-  document.getElementById('scorecard-body').innerHTML=html||'<tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:1rem;">No data found</td></tr>';
+  document.getElementById('scorecard-body').innerHTML = html || '<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,0.2);padding:1rem;">No data</td></tr>';
 }
 
+// ── Render weekly + monthly charts ──
 function renderCharts(v) {
-  const hdr=v[15]||[], wk1=hdr[4]||'W10', wk2=hdr[5]||'W11';
-  const hd=v[16]||[], ps=v[20]||[];
-  const hdT=hd[2]||334783, psT=ps[2]||37198;
-  const hdW1=hd[4]||0, hdW2=hd[5]||0, psW1=ps[4]||0, psW2=ps[5]||0;
-  const opts = { responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>`${c.dataset.label}: $${Math.round(c.raw).toLocaleString()}`}} },
-    scales:{ x:{grid:{color:gc},ticks:{color:lc}}, y:{grid:{color:gc},ticks:{color:lc,callback:v=>'$'+Math.round(v/1000)+'K'}} }
+  const hdr = v[15] || [], w1l = hdr[4] || 'W10', w2l = hdr[5] || 'W11';
+  const hd = v[16] || [], ps = v[20] || [];
+  const hdT = hd[2] || 334783, psT = ps[2] || 37198;
+  const hdW1 = hd[4] || 0, hdW2 = hd[5] || 0;
+  const psW1 = ps[4] || 0, psW2 = ps[5] || 0;
+
+  // Monthly sums — col I (idx 8) for each category row
+  const hdMonth = hd[8] || 0, psMonth = ps[8] || 0;
+
+  const weekOpts = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.dataset.label}: $${Math.round(c.raw).toLocaleString()}` } } },
+    scales: {
+      x: { grid: { color: gc }, ticks: { color: lc } },
+      y: { grid: { color: gc }, ticks: { color: lc, callback: v => '$' + Math.round(v/1000) + 'K' } }
+    }
   };
-  if(hdChartObj) hdChartObj.destroy();
-  hdChartObj = new Chart(document.getElementById('hdChart'), { data:{ labels:[wk1,wk2], datasets:[
-    {type:'bar',label:'Actual',data:[hdW1,hdW2],backgroundColor:[hdW1>=hdT?'rgba(37,99,235,0.55)':'rgba(220,38,38,0.4)',hdW2>=hdT?'rgba(37,99,235,0.55)':'rgba(220,38,38,0.4)'],borderColor:[hdW1>=hdT?'#2563eb':'#dc2626',hdW2>=hdT?'#2563eb':'#dc2626'],borderWidth:1,borderRadius:4,barPercentage:0.5},
-    {type:'line',label:'Target',data:[hdT,hdT],borderColor:'#dc2626',borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false}
-  ]}, options:opts });
-  if(psChartObj) psChartObj.destroy();
-  psChartObj = new Chart(document.getElementById('psChart'), { data:{ labels:[wk1,wk2], datasets:[
-    {type:'bar',label:'Actual',data:[psW1,psW2],backgroundColor:[psW1>=psT?'rgba(5,150,105,0.55)':'rgba(220,38,38,0.4)',psW2>=psT?'rgba(5,150,105,0.55)':'rgba(220,38,38,0.4)'],borderColor:[psW1>=psT?'#059669':'#dc2626',psW2>=psT?'#059669':'#dc2626'],borderWidth:1,borderRadius:4,barPercentage:0.5},
-    {type:'line',label:'Target',data:[psT,psT],borderColor:'#dc2626',borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false}
-  ]}, options:opts });
+
+  // H&D weekly
+  if (hdChartObj) hdChartObj.destroy();
+  hdChartObj = new Chart(document.getElementById('hdChart'), {
+    data: {
+      labels: [w1l, w2l],
+      datasets: [
+        { type:'bar', label:'Actual', data:[hdW1,hdW2],
+          backgroundColor:[hdW1>=hdT?'rgba(37,99,235,0.6)':'rgba(248,113,113,0.4)',hdW2>=hdT?'rgba(37,99,235,0.6)':'rgba(248,113,113,0.4)'],
+          borderColor:[hdW1>=hdT?'#2563eb':'#f87171',hdW2>=hdT?'#2563eb':'#f87171'],
+          borderWidth:1, borderRadius:4, barPercentage:0.5 },
+        { type:'line', label:'Target', data:[hdT,hdT], borderColor:'rgba(248,113,113,0.6)', borderDash:[5,4], borderWidth:1.5, pointRadius:0, fill:false }
+      ]
+    },
+    options: weekOpts
+  });
+
+  // PS weekly
+  if (psChartObj) psChartObj.destroy();
+  psChartObj = new Chart(document.getElementById('psChart'), {
+    data: {
+      labels: [w1l, w2l],
+      datasets: [
+        { type:'bar', label:'Actual', data:[psW1,psW2],
+          backgroundColor:[psW1>=psT?'rgba(5,150,105,0.6)':'rgba(248,113,113,0.4)',psW2>=psT?'rgba(5,150,105,0.6)':'rgba(248,113,113,0.4)'],
+          borderColor:[psW1>=psT?'#059669':'#f87171',psW2>=psT?'#059669':'#f87171'],
+          borderWidth:1, borderRadius:4, barPercentage:0.5 },
+        { type:'line', label:'Target', data:[psT,psT], borderColor:'rgba(248,113,113,0.6)', borderDash:[5,4], borderWidth:1.5, pointRadius:0, fill:false }
+      ]
+    },
+    options: weekOpts
+  });
+
+  // Monthly trend charts — collect all monthly sums from col I across weeks
+  // Rows for H&D (17=idx16) and PS (21=idx20), col I = idx 8
+  // Months headers are in row 15 (idx14), cols E,J,O = month labels
+  const months = [];
+  const hdMonths = [], psMonths = [];
+  for (let col = 4; col < 19; col += 5) {
+    const mLabel = v[14]?.[col];
+    if (mLabel) {
+      months.push(mLabel.toString().trim());
+      hdMonths.push(parseFloat(v[16]?.[col+4]) || 0);
+      psMonths.push(parseFloat(v[20]?.[col+4]) || 0);
+    }
+  }
+
+  const monthOpts = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => '$' + Math.round(c.raw).toLocaleString() } } },
+    scales: {
+      x: { grid: { color: gc }, ticks: { color: lc, font: { size: 10 } } },
+      y: { grid: { color: gc }, ticks: { color: lc, callback: v => '$' + Math.round(v/1000) + 'K', font: { size: 10 } } }
+    }
+  };
+
+  new Chart(document.getElementById('hdMonthChart'), {
+    type: 'bar',
+    data: {
+      labels: months.length ? months : ['Jan','Feb','Mar'],
+      datasets: [{
+        data: hdMonths.length ? hdMonths : [hdW1+hdW2,0,0],
+        backgroundColor: 'rgba(37,99,235,0.5)', borderColor: '#2563eb', borderWidth:1, borderRadius:3, barPercentage:0.6
+      }]
+    },
+    options: monthOpts
+  });
+
+  new Chart(document.getElementById('psMonthChart'), {
+    type: 'bar',
+    data: {
+      labels: months.length ? months : ['Jan','Feb','Mar'],
+      datasets: [{
+        data: psMonths.length ? psMonths : [psW1+psW2,0,0],
+        backgroundColor: 'rgba(5,150,105,0.5)', borderColor: '#059669', borderWidth:1, borderRadius:3, barPercentage:0.6
+      }]
+    },
+    options: monthOpts
+  });
 }
 
+// ── Render rocks ──
 function renderRocks(v) {
   let on=0, risk=0, missed=0, html='';
   for (let i=1; i<v.length; i++) {
     const r=v[i]; if(!r||!r[0]) continue;
-    const name=(r[0]||'').toString().replace(/ /g,'').trim();
+    const name=(r[0]||'').toString().trim();
     const owner=(r[1]||'').toString().trim();
     const status=(r[4]||'').toString().trim();
     const pct=typeof r[5]==='number'?Math.round(r[5]*100):0;
     const notes=(r[7]||'').toString().trim();
-    const isRisk=status==='At Risk';
-    const isMissed=status==='Missed'||status==='Off Track';
-    const isDone=pct===100;
+    const isRisk=status==='At Risk', isMissed=status==='Missed'||status==='Off Track', isDone=pct===100;
     if(isMissed) missed++; else if(isRisk) risk++; else on++;
-    const cls=isMissed?'at-risk':isRisk?'at-risk':isDone?'complete':'';
-    const dotC=isMissed?'r':isRisk?'y':'g';
-    const txtC=isMissed?'#dc2626':isRisk?'#d97706':'#15803d';
-    const barC=isMissed?'r':isRisk?'y':'g';
-    const rowStyle=isMissed?'border-color:#fca5a5;background:#fef2f2;':isRisk?'border-color:#fcd34d;background:#fffbeb;':isDone?'border-color:#6ee7b7;background:#f0fdf4;':'';
-    html+=`<div class="rock-row ${cls}" style="${rowStyle}">
+    const rowCls = isMissed?'missed':isRisk?'at-risk':isDone?'on-track':'on-track';
+    const dotC   = isMissed?'r':isRisk?'y':'g';
+    const txtC   = isMissed?'#f87171':isRisk?'#fbbf24':'#34d399';
+    const barC   = isMissed?'r':isRisk?'y':'g';
+    html+=`<div class="rock-row ${rowCls}">
       <div><div class="rock-name">${name}</div>${notes?`<div class="rock-note">${notes}</div>`:''}</div>
       <div class="rock-owner">${owner}</div>
-      <div><span class="rag" style="color:${txtC};display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;"><span class="dot ${dotC}"></span>${status}</span></div>
-      <div><div class="rock-pct" style="color:${txtC};">${pct}%</div><div class="prog-bar"><div class="prog-fill ${barC}" style="width:${pct}%;"></div></div></div>
+      <div><span class="rock-status" style="color:${txtC};"><span class="dot ${dotC}"></span>${status||'On Track'}</span></div>
+      <div>
+        <div class="rock-pct-val" style="color:${txtC};">${pct}%</div>
+        <div class="prog-bar"><div class="prog-fill ${barC}" style="width:${pct}%;"></div></div>
+      </div>
     </div>`;
   }
   document.getElementById('rocks-on-track').textContent=on+' On Track';
-  document.getElementById('rocks-at-risk').textContent=risk+' At Risk';
-  document.getElementById('rocks-at-risk').style.display=risk>0?'inline-block':'none';
-  const missedEl=document.getElementById('rocks-missed');
-  if(missedEl){ missedEl.textContent=missed+' Missed'; missedEl.style.display=missed>0?'inline-block':'none'; }
-  document.getElementById('rocks-grid').innerHTML=html||'<div style="color:#9ca3af;">No rocks found</div>';
+  const arEl=document.getElementById('rocks-at-risk');
+  arEl.textContent=risk+' At Risk'; arEl.style.display=risk>0?'':'none';
+  const mEl=document.getElementById('rocks-missed');
+  if(mEl){ mEl.textContent=missed+' Missed'; mEl.style.display=missed>0?'':'none'; }
+  document.getElementById('rocks-grid').innerHTML=html||'<div style="color:rgba(255,255,255,0.2);">No rocks found</div>';
 }
 
+// ── Render funnel ──
 function renderFunnel(v) {
   const find=lbl=>{ for(const r of v) if(r[1]&&r[1].toString().toLowerCase().includes(lbl.toLowerCase())) return r[2]; return null; };
   const s=(id,val,fmt)=>{ const el=document.getElementById(id); if(el&&val!=null) el.textContent=fmt?fmt(val):val; };
@@ -615,166 +860,92 @@ function renderFunnel(v) {
   s('f-hd-cust',   find('New Customers Needed'), v=>Math.round(v)+' customers');
   s('f-hd-opps',   find('Opportunities Needed'), v=>Math.round(v));
   s('f-hd-leads',  find('Weekly Leads Needed'), v=>Number(v).toFixed(1)+' / week');
-  s('f-ps-target', find('IXE Target Revenue'), f$);
-  s('f-ps-goget',  find('2026 Go Get Number'), f$);
-  s('f-ps-acv',    find('Ave Annual Customer Value'), f$);
-  s('f-ps-cust',   find('New Customers Needed'), v=>Math.round(v)+' customers');
-  s('f-ps-leads',  find('Weekly Leads Needed'), v=>Number(v).toFixed(1)+' / week');
 }
 
-
+// ── Render TechOS ──
 function renderTechOS(v) {
   const USI_ANNUAL = 19343037;
   const fmt$ = n => {
     if (n === null || n === undefined || isNaN(n)) return '-';
-    const abs = Math.abs(n);
-    const sign = n < 0 ? '-$' : '$';
-    if (abs >= 1e6) return sign + (abs/1e6).toFixed(2) + 'M';
-    if (abs >= 1e3) return sign + Math.round(abs/1e3).toLocaleString() + 'K';
-    return sign + Math.round(abs).toLocaleString();
+    const abs=Math.abs(n), sign=n<0?'-$':'$';
+    if(abs>=1e6) return sign+(abs/1e6).toFixed(2)+'M';
+    if(abs>=1e3) return sign+Math.round(abs/1e3).toLocaleString()+'K';
+    return sign+Math.round(abs).toLocaleString();
   };
-  const ni = (n, id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = fmt$(n);
-    el.className = 'tos-knum ' + (n > 0 ? 'pos' : n < -5000 ? 'neg' : 'amb');
+  const set=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
+  const setNI=(id,n)=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.textContent=fmt$(n);
+    el.className='kval '+(n>0?'pos':n<-5000?'neg':'amb');
   };
-  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
 
-  if (!v) {
-    set('tos-pct-actual', 'N/A');
-    return;
-  }
+  if(!v){ set('tos-pct-actual','N/A'); return; }
 
-  // Row indices (0-based): row 10=idx9 Total Income, row 16=idx15 Gross Profit
-  // row 23=idx22 Total Expense, row 25=idx24 10% Overhead, row 27=idx26 NI w/overhead
-  // row 31=idx30 Adj NI+Growth
-  // Columns: B=1(Jan), D=3(Feb), F=5(Mar), H=7(Apr), J=9(May), L=11(Jun)
-  const r  = (row, col) => parseFloat(v[row]?.[col]) || 0;
+  const r=(row,col)=>parseFloat(v[row]?.[col])||0;
+  const janRev=r(9,1), febRev=r(9,3), marRev=r(9,5);
+  const janNI=r(26,1), febNI=r(26,3), marNI=r(26,5);
+  const aprNI=r(30,7), mayNI=r(30,9), junNI=r(30,11);
+  const q2NI=aprNI+mayNI+junNI;
 
-  const janRev = r(9,1),  febRev = r(9,3),  marRev = r(9,5);
-  const janGP  = r(15,1), febGP  = r(15,3), marGP  = r(15,5);
-  const janExp = r(22,1), febExp = r(22,3), marExp = r(22,5);
-  const janOH  = r(24,1), febOH  = r(24,3), marOH  = r(24,5);
-  const janNI  = r(26,1), febNI  = r(26,3), marNI  = r(26,5);
-  const aprNI  = r(30,7), mayNI  = r(30,9), junNI  = r(30,11);
-  const q2NI   = aprNI + mayNI + junNI;
+  const annualized=((janRev+febRev+marRev)/3)*12;
+  const pctActual=(annualized/USI_ANNUAL)*100;
 
-  // VTO goal: TechOS as % of USI total revenue
-  const ytdRev   = janRev + febRev + marRev;
-  const ytdMonths = 3;
-  const annualized = (ytdRev / ytdMonths) * 12;
-  const pctActual  = (annualized / USI_ANNUAL) * 100;
-  const pctYTD     = (ytdRev / USI_ANNUAL) * 100;
+  set('tos-pct-actual', pctActual.toFixed(1)+'%');
+  const barW=Math.min((pctActual/20)*100,100);
+  document.getElementById('tos-progress-bar').style.width=barW+'%';
+  document.getElementById('tos-progress-marker').textContent='▲ '+pctActual.toFixed(1)+'%';
 
-  // Goal banner
-  set('tos-pct-actual', pctActual.toFixed(1) + '%');
-  const barWidth = Math.min((pctActual / 20) * 100, 100);
-  document.getElementById('tos-progress-bar').style.width = barWidth + '%';
-  document.getElementById('tos-progress-marker').style.marginLeft = barWidth + '%';
-  document.getElementById('tos-progress-marker').textContent = '▲ ' + pctActual.toFixed(1) + '%';
+  set('tos-jan-rev', fmt$(janRev)); setNI('tos-jan-ni', janNI);
+  set('tos-feb-rev', fmt$(febRev)); setNI('tos-feb-ni', febNI);
+  set('tos-mar-rev', fmt$(marRev)); setNI('tos-mar-ni', marNI);
+  const q2El=document.getElementById('tos-q2-ni');
+  if(q2El){ q2El.textContent=fmt$(q2NI); q2El.className='kval '+(q2NI>0?'pos':'neg'); }
+  const mayEl=document.getElementById('tos-may-ni');
+  if(mayEl){ mayEl.textContent=fmt$(mayNI); }
 
-  // KPI cards
-  set('tos-jan-rev', fmt$(janRev));
-  ni(janNI, 'tos-jan-ni');
-  set('tos-feb-rev', fmt$(febRev));
-  ni(febNI, 'tos-feb-ni');
-  set('tos-mar-rev', fmt$(marRev));
-  ni(marNI, 'tos-mar-ni');
+  const months=['Jan','Feb','Mar','Apr','May','Jun'];
+  const revAct=[janRev,febRev,marRev,null,null,null];
+  const revProj=[null,null,marRev,r(9,7)||marRev,r(9,9)||marRev,r(9,11)||marRev];
+  const niAct=[janNI,febNI,marNI,null,null,null];
+  const niProj=[null,null,marNI,aprNI,mayNI,junNI];
 
-  const q2El = document.getElementById('tos-q2-ni');
-  if (q2El) { q2El.textContent = fmt$(q2NI); q2El.className = 'tos-knum ' + (q2NI > 0 ? 'pos' : 'neg'); }
-  const mayEl = document.getElementById('tos-may-ni');
-  if (mayEl) { mayEl.textContent = fmt$(mayNI); }
-
-  // P&L Table
-  set('tt-jan-rev', fmt$(janRev)); set('tt-feb-rev', fmt$(febRev)); set('tt-mar-rev', fmt$(marRev));
-  set('tt-jan-gp',  fmt$(janGP));  set('tt-feb-gp',  fmt$(febGP));  set('tt-mar-gp',  fmt$(marGP));
-  set('tt-jan-exp', '(' + fmt$(janExp).replace('$','') + ')');
-  set('tt-feb-exp', '(' + fmt$(febExp).replace('$','') + ')');
-  set('tt-mar-exp', '(' + fmt$(marExp).replace('$','') + ')');
-  set('tt-jan-oh',  '(' + fmt$(janOH).replace('$','') + ')');
-  set('tt-feb-oh',  '(' + fmt$(febOH).replace('$','') + ')');
-  set('tt-mar-oh',  '(' + fmt$(marOH).replace('$','') + ')');
-
-  const niTbl = (id, val) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = fmt$(val);
-    el.className = (val > 0 ? 'pos-v proj-c' : val < -5000 ? 'neg-v' : 'amb-v') + (id.startsWith('tt-a') || id.startsWith('tt-m') || id.startsWith('tt-j') ? ' proj-c' : '');
-  };
-  niTbl('tt-jan-ni', janNI); niTbl('tt-feb-ni', febNI); niTbl('tt-mar-ni', marNI);
-  niTbl('tt-apr-ni', aprNI); niTbl('tt-may-ni', mayNI); niTbl('tt-jun-ni', junNI);
-
-  // Charts
-  const gc = 'rgba(0,0,0,0.06)', lc = '#374151';
-  const months = ['Jan','Feb','Mar','Apr','May','Jun'];
-  const revAct  = [janRev, febRev, marRev, null, null, null];
-  const revProj = [null, null, marRev, r(9,7)||marRev, r(9,9)||marRev, r(9,11)||marRev];
-  const niAct   = [janNI, febNI, marNI, null, null, null];
-  const niProj  = [null, null, marNI, aprNI, mayNI, junNI];
-
-  // Revenue + NI trend chart
-  if (window.tosRevChartInst) window.tosRevChartInst.destroy();
-  window.tosRevChartInst = new Chart(document.getElementById('tosRevChart'), {
-    data: {
-      labels: months,
-      datasets: [
-        { type:'bar', label:'Revenue (actual)', data: revAct, backgroundColor:'rgba(5,150,105,0.5)', borderColor:'#059669', borderWidth:1, borderRadius:3, barPercentage:0.5, yAxisID:'yR', order:2 },
-        { type:'bar', label:'Revenue (proj)',   data: revProj, backgroundColor:'rgba(5,150,105,0.2)', borderColor:'#059669', borderWidth:1, borderDash:[4,3], borderRadius:3, barPercentage:0.5, yAxisID:'yR', order:2 },
-        { type:'line', label:'NI (actual)',  data: niAct,  borderColor:'#1d4ed8', backgroundColor:'transparent', pointBackgroundColor:'#1d4ed8', pointRadius:5, tension:0.3, yAxisID:'yN', order:1, spanGaps:false },
-        { type:'line', label:'NI (proj)',    data: niProj, borderColor:'#1d4ed8', backgroundColor:'transparent', pointBackgroundColor:'#1d4ed8', pointRadius:5, borderDash:[5,4], tension:0.3, yAxisID:'yN', order:1, spanGaps:false }
-      ]
-    },
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: c => c.raw === null ? null : c.dataset.label+': '+fmt$(c.raw) }}},
-      scales:{
-        x:{ grid:{color:gc}, ticks:{color:lc} },
-        yR:{ position:'left', grid:{color:gc}, ticks:{color:lc, callback:v=>'$'+Math.round(v/1000)+'K'}, title:{display:true,text:'Revenue',color:lc,font:{size:10}} },
-        yN:{ position:'right', grid:{drawOnChartArea:false}, ticks:{color:lc, callback:v=>(v<0?'-$':'$')+Math.abs(Math.round(v/1000))+'K'}, title:{display:true,text:'Net income',color:lc,font:{size:10}} }
-      }
-    }
-  });
-
-  // % of USI revenue chart
-  const monthlyRevs = [janRev, febRev, marRev];
-  const monthlyPcts = monthlyRevs.map(r => parseFloat(((r / (USI_ANNUAL/12)) * 100).toFixed(1)));
-  if (window.tosPctChartInst) window.tosPctChartInst.destroy();
-  window.tosPctChartInst = new Chart(document.getElementById('tosPctChart'), {
-    type:'bar',
-    data:{
-      labels:['January','February','March'],
-      datasets:[
-        { label:'TechOS % of monthly USI target', data: monthlyPcts,
-          backgroundColor: monthlyPcts.map(p => p >= 20 ? 'rgba(5,150,105,0.5)' : p >= 10 ? 'rgba(217,119,6,0.4)' : 'rgba(220,38,38,0.4)'),
-          borderColor: monthlyPcts.map(p => p >= 20 ? '#059669' : p >= 10 ? '#d97706' : '#dc2626'),
-          borderWidth:1, borderRadius:4, barPercentage:0.5 }
-      ]
-    },
+  if(window.tosRevChartInst) window.tosRevChartInst.destroy();
+  window.tosRevChartInst=new Chart(document.getElementById('tosRevChart'),{
+    data:{labels:months,datasets:[
+      {type:'bar',label:'Rev actual',data:revAct,backgroundColor:'rgba(52,211,153,0.45)',borderColor:'#34d399',borderWidth:1,borderRadius:3,barPercentage:0.5,yAxisID:'yR',order:2},
+      {type:'bar',label:'Rev proj',data:revProj,backgroundColor:'rgba(52,211,153,0.15)',borderColor:'rgba(52,211,153,0.4)',borderWidth:1,borderRadius:3,barPercentage:0.5,yAxisID:'yR',order:2},
+      {type:'line',label:'NI actual',data:niAct,borderColor:'#60a5fa',backgroundColor:'transparent',pointBackgroundColor:'#60a5fa',pointRadius:5,tension:0.3,yAxisID:'yN',order:1,spanGaps:false},
+      {type:'line',label:'NI proj',data:niProj,borderColor:'#60a5fa',backgroundColor:'transparent',pointBackgroundColor:'#60a5fa',pointRadius:5,borderDash:[5,4],tension:0.3,yAxisID:'yN',order:1,spanGaps:false}
+    ]},
     options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{ callbacks:{ label: c => 'TechOS share: '+c.raw+'%' }},
-        annotation:{}
-      },
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw===null?null:c.dataset.label+': '+fmt$(c.raw)}}},
       scales:{
         x:{grid:{color:gc},ticks:{color:lc}},
-        y:{
-          grid:{color:gc}, ticks:{color:lc, callback:v=>v+'%'},
-          max:25,
-          plugins:{},
-          title:{display:true, text:'% of monthly USI target', color:lc, font:{size:10}}
-        }
+        yR:{position:'left',grid:{color:gc},ticks:{color:lc,callback:v=>'$'+Math.round(v/1000)+'K'},title:{display:true,text:'Revenue',color:lc,font:{size:10}}},
+        yN:{position:'right',grid:{drawOnChartArea:false},ticks:{color:lc,callback:v=>(v<0?'-$':'$')+Math.abs(Math.round(v/1000))+'K'},title:{display:true,text:'Net income',color:lc,font:{size:10}}}
       }
     }
   });
-  // Draw 20% goal line manually as a dataset
-  window.tosPctChartInst.data.datasets.push({
-    type:'line', label:'20% goal', data:[20,20,20],
-    borderColor:'#dc2626', borderDash:[5,4], borderWidth:1.5, pointRadius:0, fill:false
+
+  const monthlyRevs=[janRev,febRev,marRev];
+  const monthlyPcts=monthlyRevs.map(rv=>parseFloat(((rv/(USI_ANNUAL/12))*100).toFixed(1)));
+  if(window.tosPctChartInst) window.tosPctChartInst.destroy();
+  window.tosPctChartInst=new Chart(document.getElementById('tosPctChart'),{
+    type:'bar',
+    data:{labels:['January','February','March'],datasets:[
+      {label:'TechOS %',data:monthlyPcts,
+       backgroundColor:monthlyPcts.map(p=>p>=20?'rgba(52,211,153,0.5)':p>=10?'rgba(251,191,36,0.4)':'rgba(248,113,113,0.4)'),
+       borderColor:monthlyPcts.map(p=>p>=20?'#34d399':p>=10?'#fbbf24':'#f87171'),
+       borderWidth:1,borderRadius:4,barPercentage:0.5}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'TechOS share: '+c.raw+'%'}}},
+      scales:{x:{grid:{color:gc},ticks:{color:lc}},y:{grid:{color:gc},ticks:{color:lc,callback:v=>v+'%'},max:25}}
+    }
   });
+  window.tosPctChartInst.data.datasets.push({type:'line',label:'20% goal',data:[20,20,20],borderColor:'rgba(248,113,113,0.6)',borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false});
   window.tosPctChartInst.update();
 }
 
