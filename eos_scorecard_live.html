@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USI EOS Scorecard 2026</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #ffffff; color: #111827; min-height: 100vh; padding: 2rem; }
+.report { max-width: 980px; margin: 0 auto; }
+#login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 1.5rem; }
+#login-screen h2 { font-size: 24px; font-weight: 700; color: #111827; }
+#login-screen p { font-size: 13px; color: #6b7280; text-align: center; max-width: 400px; line-height: 1.6; }
+#login-btn { background: #0f766e; color: #fff; border: none; border-radius: 6px; padding: 12px 32px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+#login-btn:hover { background: #0d6460; }
+#loading-screen { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 1rem; }
+.spinner { width: 36px; height: 36px; border: 3px solid #e5e7eb; border-top-color: #0f766e; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#loading-screen p { font-size: 13px; color: #6b7280; }
+#error-screen { display: none; padding: 2rem; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; margin: 2rem 0; }
+#error-screen h3 { color: #dc2626; margin-bottom: 8px; }
+#error-screen p { font-size: 12px; color: #7f1d1d; line-height: 1.7; white-space: pre-wrap; }
+#dashboard { display: none; }
+.hdr { border-bottom: 1px solid #e5e7eb; padding-bottom: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; }
+.eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; color: #0f766e; font-weight: 600; margin-bottom: 6px; }
+.ttl { font-size: 42px; font-weight: 700; letter-spacing: -0.02em; color: #111827; line-height: 1; }
+.sub { font-size: 13px; color: #6b7280; margin-top: 6px; }
+.hdr-right { text-align: right; }
+.qbadge { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; background: #f3f4f6; border: 1px solid #e5e7eb; padding: 6px 12px; border-radius: 4px; color: #6b7280; display: block; margin-bottom: 4px; }
+.presenter { font-size: 11px; color: #9ca3af; text-align: right; }
+.signout-btn { font-size: 10px; color: #9ca3af; background: none; border: none; cursor: pointer; padding: 4px 0; font-family: inherit; }
+.signout-btn:hover { color: #6b7280; }
+.sec { margin-bottom: 2.5rem; }
+.slbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: #9ca3af; font-weight: 600; margin-bottom: 0.75rem; }
+.divider { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
+.last-updated { font-size: 10px; color: #9ca3af; text-align: right; margin-bottom: 1rem; }
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.kpi { background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px; padding: 1rem 1.125rem; }
+.knum { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; color: #1d4ed8; }
+.klbl { font-size: 11px; color: #6b7280; margin-top: 5px; line-height: 1.4; }
+.ktarget { font-size: 9px; color: #9ca3af; margin-top: 3px; }
+.sc-wrap { overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 10px; }
+table.sc { width: 100%; border-collapse: collapse; font-size: 11px; }
+table.sc thead th { background: #f9fafb; color: #374151; font-weight: 600; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; padding: 8px 10px; text-align: center; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+table.sc thead th.left { text-align: left; }
+table.sc thead th.mh { background: #f0fdf4; color: #065f46; }
+table.sc tbody td { padding: 7px 10px; border-bottom: 1px solid #f3f4f6; color: #374151; white-space: nowrap; text-align: center; font-size: 11px; }
+table.sc tbody td.left { text-align: left; }
+table.sc tbody td.cat { font-weight: 700; color: #111827; font-size: 10px; background: #f9fafb; }
+.rag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot.g { background: #059669; } .dot.r { background: #dc2626; } .dot.y { background: #d97706; } .dot.n { background: #d1d5db; }
+.rag.g { color: #15803d; } .rag.r { color: #dc2626; } .rag.y { color: #d97706; } .rag.n { color: #9ca3af; }
+.badge { display: inline-block; font-size: 8px; font-weight: 700; text-transform: uppercase; padding: 1px 5px; border-radius: 2px; }
+.badge.g { background: #d1fae5; color: #065f46; } .badge.r { background: #fee2e2; color: #b91c1c; } .badge.y { background: #fef3c7; color: #d97706; } .badge.n { background: #f3f4f6; color: #9ca3af; }
+.chart-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; margin-bottom: 10px; }
+.chart-lbl { font-size: 11px; color: #4b5563; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 6px; }
+.chart-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.li { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #4b5563; }
+.rocks-grid { display: grid; gap: 6px; }
+.rock-row { display: grid; grid-template-columns: 1fr 140px 90px 80px; gap: 10px; align-items: center; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 7px; padding: 10px 14px; }
+.rock-row.at-risk { border-color: #fca5a5; background: #fef2f2; }
+.rock-row.complete { border-color: #6ee7b7; background: #f0fdf4; }
+.rock-name { font-size: 11px; font-weight: 500; color: #111827; line-height: 1.4; }
+.rock-note { font-size: 9px; color: #6b7280; margin-top: 2px; }
+.rock-owner { font-size: 10px; color: #6b7280; }
+.rock-pct { font-size: 11px; font-weight: 700; text-align: right; }
+.prog-bar { height: 4px; border-radius: 2px; background: #e5e7eb; margin-top: 4px; }
+.prog-fill { height: 100%; border-radius: 2px; }
+.prog-fill.g { background: #059669; } .prog-fill.y { background: #d97706; } .prog-fill.r { background: #dc2626; }
+.funnel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.funnel-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.125rem; background: #ffffff; }
+.funnel-title { font-size: 12px; font-weight: 600; color: #111827; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.funnel-dot { width: 8px; height: 8px; border-radius: 50%; }
+.frow { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid #f3f4f6; }
+.frow:last-child { border-bottom: none; }
+.fkey { font-size: 10px; color: #6b7280; }
+.fval { font-size: 11px; font-weight: 600; color: #111827; }
+.fval.g { color: #15803d; } .fval.b { color: #1d4ed8; }
+.rag-legend { display: flex; gap: 16px; margin-bottom: 10px; font-size: 10px; color: #6b7280; flex-wrap: wrap; }
+.rl { display: flex; align-items: center; gap: 4px; }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div style="text-align:center;">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.14em;color:#0f766e;font-weight:600;margin-bottom:8px;">Universal Systems Inc.</div>
+    <h2>EOS Scorecard Dashboard</h2>
+  </div>
+  <p>Sign in with your Microsoft 365 account to load live scorecard data directly from SharePoint.</p>
+  <button id="login-btn" onclick="signIn()">Sign in with Microsoft</button>
+</div>
+
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <p id="loading-msg">Connecting to SharePoint...</p>
+</div>
+
+<div id="error-screen">
+  <h3>Could not load scorecard data</h3>
+  <p id="error-msg"></p>
+</div>
+
+<div id="dashboard">
+<div class="report">
+
+  <div class="hdr">
+    <div>
+      <div class="eyebrow">Universal Systems Inc. - Weekly Leadership Review</div>
+      <div class="ttl">EOS Scorecard</div>
+      <div class="sub">Weekly Metrics - Rocks - Annual Targets - 2026</div>
+    </div>
+    <div class="hdr-right">
+      <span class="qbadge" id="period-badge">2026</span>
+      <div class="presenter">L10 Leadership Review</div>
+      <button class="signout-btn" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="last-updated" id="last-updated"></div>
+
+  <div class="sec">
+    <div class="slbl">2026 annual targets</div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="knum" id="t-total-rev">-</div><div class="klbl">Total revenue target</div><div class="ktarget" id="t-total-wk">-</div></div>
+      <div class="kpi"><div class="knum" id="t-hd-rev">-</div><div class="klbl">Hardware and Devices target</div><div class="ktarget" id="t-hd-wk">-</div></div>
+      <div class="kpi"><div class="knum" id="t-ps-rev">-</div><div class="klbl">Professional Services target</div><div class="ktarget" id="t-ps-wk">-</div></div>
+      <div class="kpi"><div class="knum" id="t-net">-</div><div class="klbl">Net profit target</div><div class="ktarget">10% net margin goal</div></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="sec">
+    <div class="slbl">Weekly scorecard</div>
+    <div class="rag-legend">
+      <div class="rl"><span class="dot g"></span> On target</div>
+      <div class="rl"><span class="dot y"></span> Within 90% of target</div>
+      <div class="rl"><span class="dot r"></span> Below target</div>
+      <div class="rl"><span class="dot n"></span> No data</div>
+    </div>
+    <div class="sc-wrap">
+      <table class="sc">
+        <thead>
+          <tr>
+            <th class="left" style="width:120px;">Category</th>
+            <th class="left" style="width:160px;">Measure</th>
+            <th class="left" style="width:100px;">Target</th>
+            <th class="left" style="width:80px;">Owner</th>
+            <th class="mh" id="wk1-hdr">Week A</th>
+            <th class="mh" id="wk2-hdr">Week B</th>
+            <th class="mh">Month total</th>
+          </tr>
+        </thead>
+        <tbody id="scorecard-body">
+          <tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:2rem;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="sec">
+    <div class="slbl">Revenue trend - actuals vs weekly target</div>
+    <div class="chart-2col">
+      <div class="chart-box" style="margin-bottom:0;">
+        <div class="chart-lbl">Hardware and Devices invoicing
+          <div class="legend">
+            <div class="li"><span style="width:8px;height:8px;border-radius:2px;background:#2563eb;display:inline-block;"></span>Actual</div>
+            <div class="li"><span style="width:14px;border-top:2px dashed #dc2626;display:inline-block;"></span>Target</div>
+          </div>
+        </div>
+        <div style="position:relative;height:190px;"><canvas id="hdChart"></canvas></div>
+      </div>
+      <div class="chart-box" style="margin-bottom:0;">
+        <div class="chart-lbl">Professional Services invoicing
+          <div class="legend">
+            <div class="li"><span style="width:8px;height:8px;border-radius:2px;background:#059669;display:inline-block;"></span>Actual</div>
+            <div class="li"><span style="width:14px;border-top:2px dashed #dc2626;display:inline-block;"></span>Target</div>
+          </div>
+        </div>
+        <div style="position:relative;height:190px;"><canvas id="psChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="sec">
+    <div class="slbl">Q1 2026 rocks - due March 31, 2026</div>
+    <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+      <div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#065f46;" id="rocks-on-track">- On Track</div>
+      <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#b91c1c;" id="rocks-at-risk">- At Risk</div>
+    </div>
+    <div class="rocks-grid" id="rocks-grid"><div style="text-align:center;color:#9ca3af;padding:2rem;">Loading...</div></div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="sec">
+    <div class="slbl">2026 sales funnel targets</div>
+    <div class="funnel-grid">
+      <div class="funnel-card">
+        <div class="funnel-title"><div class="funnel-dot" style="background:#2563eb;"></div>Hardware and Devices</div>
+        <div class="frow"><span class="fkey">2026 target</span><span class="fval b" id="f-hd-target">-</span></div>
+        <div class="frow"><span class="fkey">2025 actual revenue</span><span class="fval" id="f-hd-2025">-</span></div>
+        <div class="frow"><span class="fkey">Go-get number</span><span class="fval b" id="f-hd-goget">-</span></div>
+        <div class="frow"><span class="fkey">New customers needed</span><span class="fval" id="f-hd-cust">-</span></div>
+        <div class="frow"><span class="fkey">Opportunities needed (40% win rate)</span><span class="fval" id="f-hd-opps">-</span></div>
+        <div class="frow"><span class="fkey">Weekly leads needed</span><span class="fval b" id="f-hd-leads">-</span></div>
+      </div>
+      <div class="funnel-card">
+        <div class="funnel-title"><div class="funnel-dot" style="background:#059669;"></div>Professional Services (IXE)</div>
+        <div class="frow"><span class="fkey">2026 target</span><span class="fval g" id="f-ps-target">-</span></div>
+        <div class="frow"><span class="fkey">2025 actual revenue</span><span class="fval" id="f-ps-2025">-</span></div>
+        <div class="frow"><span class="fkey">Go-get number</span><span class="fval g" id="f-ps-goget">-</span></div>
+        <div class="frow"><span class="fkey">Avg annual customer value</span><span class="fval" id="f-ps-acv">-</span></div>
+        <div class="frow"><span class="fkey">New customers needed</span><span class="fval" id="f-ps-cust">-</span></div>
+        <div class="frow"><span class="fkey">Weekly leads needed</span><span class="fval g" id="f-ps-leads">-</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+<script>
+const CONFIG = {
+  clientId: '3565db63-2a61-4eaf-a84e-7577e5369a5c',
+  tenantId: 'YOUR_TENANT_ID_HERE',
+  shareId:  'u!aHR0cHM6Ly91bml2ZXJzYWxzeXN0ZW1zaW5jMTAwLnNoYXJlcG9pbnQuY29tLzp4Oi9zL0wxMC9JUURSZ3B4VTctZ2lSSUN3Nkl2YmJGVzNBYmgxU1FCOHpYbGxJc0ExTWN1d19pMD9lPW11QmFtVQ'
+};
+
+let msalInstance, hdChartObj, psChartObj;
+
+function show(id) {
+  ['login-screen','loading-screen','error-screen','dashboard'].forEach(s => {
+    const el = document.getElementById(s);
+    el.style.display = (s === id) ? (s==='dashboard'||s==='error-screen' ? 'block' : 'flex') : 'none';
+  });
+}
+function setLoading(msg) { show('loading-screen'); document.getElementById('loading-msg').textContent = msg; }
+function showError(msg)  { show('error-screen');  document.getElementById('error-msg').textContent = msg; }
+
+async function init() {
+  if (CONFIG.clientId === '3565db63-2a61-4eaf-a84e-7577e5369a5c') { show('login-screen'); return; }
+  try {
+    msalInstance = new msal.PublicClientApplication({
+      auth: { clientId: CONFIG.clientId, authority: 'https://login.microsoftonline.com/' + CONFIG.tenantId, redirectUri: window.location.href.split('?')[0] }
+    });
+    await msalInstance.initialize();
+    await msalInstance.handleRedirectPromise();
+    const accounts = msalInstance.getAllAccounts();
+    if (accounts.length > 0) {
+      try {
+        const r = await msalInstance.acquireTokenSilent({ scopes: ['Files.Read','Sites.Read.All'], account: accounts[0] });
+        await loadData(r.accessToken);
+      } catch { show('login-screen'); }
+    } else { show('login-screen'); }
+  } catch(e) { show('login-screen'); }
+}
+
+async function signIn() {
+  if (!msalInstance) {
+    msalInstance = new msal.PublicClientApplication({
+      auth: { clientId: CONFIG.clientId, authority: 'https://login.microsoftonline.com/' + CONFIG.tenantId, redirectUri: window.location.href.split('?')[0] }
+    });
+    await msalInstance.initialize();
+  }
+  try {
+    setLoading('Signing in...');
+    const r = await msalInstance.loginPopup({ scopes: ['Files.Read','Sites.Read.All'] });
+    await loadData(r.accessToken);
+  } catch(e) {
+    showError('Sign-in failed. Make sure your Client ID and Tenant ID are filled in.
+
+Error: ' + e.message);
+  }
+}
+
+function signOut() { if (msalInstance) msalInstance.logoutPopup(); show('login-screen'); }
+
+async function api(token, path) {
+  const r = await fetch('https://graph.microsoft.com/v1.0' + path, { headers: { Authorization: 'Bearer ' + token } });
+  if (!r.ok) { const t = await r.text(); throw new Error('(' + r.status + ') ' + path + '\n' + t); }
+  return r.json();
+}
+
+async function loadData(token) {
+  try {
+    setLoading('Reading scorecard from SharePoint...');
+    const base = '/shares/' + CONFIG.shareId + '/driveItem/workbook';
+    const [sc, rocks, funnel] = await Promise.all([
+      api(token, base + "/worksheets('EOS%20Scorecard%20Tracking')/usedRange"),
+      api(token, base + "/worksheets('Rocks%20ScoreCard')/usedRange"),
+      api(token, base + "/worksheets('%20Funnel%20Assumptions')/usedRange")
+    ]);
+    renderTargets(sc.values);
+    renderScorecard(sc.values);
+    renderCharts(sc.values);
+    renderRocks(rocks.values);
+    renderFunnel(funnel.values);
+    document.getElementById('last-updated').textContent = 'Live data loaded: ' + new Date().toLocaleString();
+    show('dashboard');
+  } catch(e) {
+    showError('Could not read Excel data.\n\n' + e.message + '\n\nIf you see 403: an admin needs to grant consent in Azure portal.\nIf you see 404: the file sharing link may have changed.');
+  }
+}
+
+const f$ = v => '$' + Number(v).toLocaleString('en-US',{maximumFractionDigits:0});
+const fK = v => '$' + Math.round(v/1000) + 'K';
+const gc = 'rgba(0,0,0,0.06)', lc = '#374151';
+
+function renderTargets(v) {
+  const s = (id,val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  s('t-total-rev', f$(v[11]?.[1]||19343037));
+  s('t-total-wk',  f$(v[11]?.[2]||371981) + ' weekly');
+  s('t-hd-rev',    f$(v[9]?.[1]||17408733));
+  s('t-hd-wk',     f$(v[9]?.[2]||334783) + ' weekly - Rachel W');
+  s('t-ps-rev',    f$(v[10]?.[1]||1934304));
+  s('t-ps-wk',     f$(v[10]?.[2]||37198) + ' weekly - Chris');
+  s('t-net',       f$(v[12]?.[1]||1934304));
+  const month = v[14]?.[4]||'';
+  document.getElementById('period-badge').textContent = '2026' + (month ? ' - ' + month : '');
+}
+
+function rag(actual, target, lower) {
+  if (actual==null||!target) return 'n';
+  if (lower) return actual<=target?'g':actual<=target*1.2?'y':'r';
+  const r=actual/target; return r>=1?'g':r>=0.9?'y':'r';
+}
+
+function renderScorecard(v) {
+  const w1l=v[15]?.[4]||'W10', w2l=v[15]?.[5]||'W11';
+  document.getElementById('wk1-hdr').textContent=w1l;
+  document.getElementById('wk2-hdr').textContent=w2l;
+  const lowerIsBetter = s => ['sla','return','strike','breach'].some(x=>s.toLowerCase().includes(x));
+  let html='', lastCat='';
+  for (let i=16; i<v.length&&i<=29; i++) {
+    const r=v[i]; if(!r) continue;
+    const cat=(r[0]||'').toString().trim(), meas=(r[1]||'').toString().trim();
+    const tgt=r[2], owner=(r[3]||'').toString().trim();
+    const w1=r[4], w2=r[5], ms=r[8];
+    if (!meas) continue;
+    if (cat&&cat!==lastCat) { html+=`<tr><td colspan="7" class="left cat">${cat}</td></tr>`; lastCat=cat; }
+    const lib=lowerIsBetter(meas);
+    const tgtD=tgt!=null?(tgt>1000?fK(tgt):Number(tgt).toFixed(tgt<10?1:0)):'-';
+    const w1d=w1!=null?(w1>999?f$(w1):w1):'-';
+    const w2d=w2!=null?(w2>999?f$(w2):w2):'-';
+    const msd=ms!=null?(ms>999?f$(ms):ms):'-';
+    const r1=rag(w1,tgt,lib), r2=rag(w2,tgt,lib), rm=rag(ms,tgt*2,lib);
+    html+=`<tr>
+      <td class="left" style="padding-left:20px;color:#9ca3af;font-size:10px;"></td>
+      <td class="left" style="color:#4b5563;font-size:10px;">${meas}</td>
+      <td class="left" style="color:#9ca3af;font-size:10px;">${tgtD}</td>
+      <td class="left" style="color:#6b7280;font-size:10px;">${owner}</td>
+      <td><span class="rag ${r1}"><span class="dot ${r1}"></span>${w1d}</span></td>
+      <td><span class="rag ${r2}"><span class="dot ${r2}"></span>${w2d}</span></td>
+      <td><span class="badge ${rm}">${msd}</span></td>
+    </tr>`;
+  }
+  document.getElementById('scorecard-body').innerHTML=html||'<tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:1rem;">No data found</td></tr>';
+}
+
+function renderCharts(v) {
+  const hdr=v[15]||[], wk1=hdr[4]||'W10', wk2=hdr[5]||'W11';
+  const hd=v[16]||[], ps=v[20]||[];
+  const hdT=hd[2]||334783, psT=ps[2]||37198;
+  const hdW1=hd[4]||0, hdW2=hd[5]||0, psW1=ps[4]||0, psW2=ps[5]||0;
+  const opts = { responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>`${c.dataset.label}: $${Math.round(c.raw).toLocaleString()}`}} },
+    scales:{ x:{grid:{color:gc},ticks:{color:lc}}, y:{grid:{color:gc},ticks:{color:lc,callback:v=>'$'+Math.round(v/1000)+'K'}} }
+  };
+  if(hdChartObj) hdChartObj.destroy();
+  hdChartObj = new Chart(document.getElementById('hdChart'), { data:{ labels:[wk1,wk2], datasets:[
+    {type:'bar',label:'Actual',data:[hdW1,hdW2],backgroundColor:[hdW1>=hdT?'rgba(37,99,235,0.55)':'rgba(220,38,38,0.4)',hdW2>=hdT?'rgba(37,99,235,0.55)':'rgba(220,38,38,0.4)'],borderColor:[hdW1>=hdT?'#2563eb':'#dc2626',hdW2>=hdT?'#2563eb':'#dc2626'],borderWidth:1,borderRadius:4,barPercentage:0.5},
+    {type:'line',label:'Target',data:[hdT,hdT],borderColor:'#dc2626',borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false}
+  ]}, options:opts });
+  if(psChartObj) psChartObj.destroy();
+  psChartObj = new Chart(document.getElementById('psChart'), { data:{ labels:[wk1,wk2], datasets:[
+    {type:'bar',label:'Actual',data:[psW1,psW2],backgroundColor:[psW1>=psT?'rgba(5,150,105,0.55)':'rgba(220,38,38,0.4)',psW2>=psT?'rgba(5,150,105,0.55)':'rgba(220,38,38,0.4)'],borderColor:[psW1>=psT?'#059669':'#dc2626',psW2>=psT?'#059669':'#dc2626'],borderWidth:1,borderRadius:4,barPercentage:0.5},
+    {type:'line',label:'Target',data:[psT,psT],borderColor:'#dc2626',borderDash:[5,4],borderWidth:1.5,pointRadius:0,fill:false}
+  ]}, options:opts });
+}
+
+function renderRocks(v) {
+  let on=0, risk=0, html='';
+  for (let i=1; i<v.length; i++) {
+    const r=v[i]; if(!r||!r[0]) continue;
+    const name=(r[0]||'').toString().replace(/ /g,'').trim();
+    const owner=(r[1]||'').toString().trim();
+    const status=(r[4]||'').toString().trim();
+    const pct=typeof r[5]==='number'?Math.round(r[5]*100):0;
+    const notes=(r[7]||'').toString().trim();
+    const isRisk=status==='At Risk', isDone=pct===100;
+    if(isRisk) risk++; else on++;
+    const cls=isRisk?'at-risk':isDone?'complete':'';
+    const dotC=isRisk?'y':'g', txtC=isRisk?'#d97706':'#15803d';
+    const barC=isRisk?(pct<50?'r':'y'):'g';
+    html+=`<div class="rock-row ${cls}">
+      <div><div class="rock-name">${name}</div>${notes?`<div class="rock-note">${notes}</div>`:''}</div>
+      <div class="rock-owner">${owner}</div>
+      <div><span class="rag" style="color:${txtC};display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;"><span class="dot ${dotC}"></span>${status}</span></div>
+      <div><div class="rock-pct" style="color:${txtC};">${pct}%</div><div class="prog-bar"><div class="prog-fill ${barC}" style="width:${pct}%;"></div></div></div>
+    </div>`;
+  }
+  document.getElementById('rocks-on-track').textContent=on+' On Track';
+  document.getElementById('rocks-at-risk').textContent=risk+' At Risk';
+  document.getElementById('rocks-grid').innerHTML=html||'<div style="color:#9ca3af;">No rocks found</div>';
+}
+
+function renderFunnel(v) {
+  const find=lbl=>{ for(const r of v) if(r[1]&&r[1].toString().toLowerCase().includes(lbl.toLowerCase())) return r[2]; return null; };
+  const s=(id,val,fmt)=>{ const el=document.getElementById(id); if(el&&val!=null) el.textContent=fmt?fmt(val):val; };
+  s('f-hd-target', find('Hardware & Devices Target'), f$);
+  s('f-hd-2025',   find('2025 Revenue'), f$);
+  s('f-hd-goget',  find('2026 Go Get Number'), f$);
+  s('f-hd-cust',   find('New Customers Needed'), v=>Math.round(v)+' customers');
+  s('f-hd-opps',   find('Opportunities Needed'), v=>Math.round(v));
+  s('f-hd-leads',  find('Weekly Leads Needed'), v=>Number(v).toFixed(1)+' / week');
+  s('f-ps-target', find('IXE Target Revenue'), f$);
+  s('f-ps-goget',  find('2026 Go Get Number'), f$);
+  s('f-ps-acv',    find('Ave Annual Customer Value'), f$);
+  s('f-ps-cust',   find('New Customers Needed'), v=>Math.round(v)+' customers');
+  s('f-ps-leads',  find('Weekly Leads Needed'), v=>Number(v).toFixed(1)+' / week');
+}
+
+init();
+</script>
+</body>
+</html>
