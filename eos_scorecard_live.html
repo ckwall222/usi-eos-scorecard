@@ -465,7 +465,7 @@ async function loadData(token) {
     // Get site, then drive, then file by path
     const site = await api(token, '/sites/universalsystemsinc100.sharepoint.com:/sites/L10');
     const drive = await api(token, '/sites/' + site.id + '/drive');
-    const file  = await api(token, '/drives/' + drive.id + "/root:/EOS Scorecard Data Sheet.xlsx:");
+    const file  = await api(token, '/drives/' + drive.id + "/root:/TechOS PL updated.xlsx:");
     const base  = '/drives/' + drive.id + '/items/' + file.id + '/workbook';
     const [sc, rocks, funnel] = await Promise.all([
       api(token, base + "/worksheets('EOS%20Scorecard%20Tracking')/usedRange"),
@@ -483,7 +483,7 @@ async function loadData(token) {
       setLoading('Loading TechOS financial data...');
       const finSite  = await api(token, '/sites/universalsystemsinc100.sharepoint.com:/sites/Finance');
       const finDrive = await api(token, '/sites/' + finSite.id + '/drive');
-      const finFile  = await api(token, '/drives/' + finDrive.id + '/root:/EOS Scorecard Data Sheet.xlsx:');
+      const finFile  = await api(token, '/drives/' + finDrive.id + '/root:/TechOS PL updated.xlsx:');
       const tosBase  = '/drives/' + finDrive.id + '/items/' + finFile.id + '/workbook';
       const tosSheet = await api(token, tosBase + "/worksheets('Sheet1')/usedRange");
       renderTechOS(tosSheet.values);
