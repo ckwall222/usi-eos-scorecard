@@ -234,7 +234,8 @@ table.tos-tbl tbody tr.tbl-total td.proj-c { background: #e0effe; }
     <div class="slbl">Q1 2026 rocks - due March 31, 2026</div>
     <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
       <div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#065f46;" id="rocks-on-track">- On Track</div>
-      <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#b91c1c;" id="rocks-at-risk">- At Risk</div>
+      <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#d97706;" id="rocks-at-risk">- At Risk</div>
+      <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#b91c1c;" id="rocks-missed" style="display:none;">- Missed</div>
     </div>
     <div class="rocks-grid" id="rocks-grid"><div style="text-align:center;color:#9ca3af;padding:2rem;">Loading...</div></div>
   </div>
@@ -606,7 +607,10 @@ function renderRocks(v) {
     </div>`;
   }
   document.getElementById('rocks-on-track').textContent=on+' On Track';
-  document.getElementById('rocks-at-risk').textContent=risk+' At Risk'+(missed?' · '+missed+' Missed':'');
+  document.getElementById('rocks-at-risk').textContent=risk+' At Risk';
+  document.getElementById('rocks-at-risk').style.display=risk>0?'inline-block':'none';
+  const missedEl=document.getElementById('rocks-missed');
+  if(missedEl){ missedEl.textContent=missed+' Missed'; missedEl.style.display=missed>0?'inline-block':'none'; }
   document.getElementById('rocks-grid').innerHTML=html||'<div style="color:#9ca3af;">No rocks found</div>';
 }
 
