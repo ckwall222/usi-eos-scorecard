@@ -55,7 +55,7 @@ table.sc tbody td.cat { font-weight: 700; color: #111827; font-size: 10px; backg
 .badge.g { background: #d1fae5; color: #065f46; } .badge.r { background: #fee2e2; color: #b91c1c; } .badge.y { background: #fef3c7; color: #d97706; } .badge.n { background: #f3f4f6; color: #9ca3af; }
 .chart-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; margin-bottom: 10px; }
 .chart-lbl { font-size: 11px; color: #4b5563; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 6px; }
-.chart-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.chart-2col { display: grid; grid-template-columns: 1fr; max-width: 520px; gap: 10px; margin-bottom: 10px; }
 .legend { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .li { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #4b5563; }
 .rocks-grid { display: grid; gap: 6px; }
@@ -69,7 +69,7 @@ table.sc tbody td.cat { font-weight: 700; color: #111827; font-size: 10px; backg
 .prog-bar { height: 4px; border-radius: 2px; background: #e5e7eb; margin-top: 4px; }
 .prog-fill { height: 100%; border-radius: 2px; }
 .prog-fill.g { background: #059669; } .prog-fill.y { background: #d97706; } .prog-fill.r { background: #dc2626; }
-.funnel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.funnel-grid { display: grid; grid-template-columns: 1fr; gap: 12px; max-width: 520px; }
 .funnel-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.125rem; background: #ffffff; }
 .funnel-title { font-size: 12px; font-weight: 600; color: #111827; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
 .funnel-dot { width: 8px; height: 8px; border-radius: 50%; }
@@ -243,7 +243,7 @@ table.tos-tbl tbody tr.tbl-total td.proj-c { background: #e0effe; }
   <hr class="divider">
 
   <div class="sec">
-    <div class="slbl">2026 sales funnel targets</div>
+    <div class="slbl">2026 Hardware &amp; Devices sales funnel</div>
     <div class="funnel-grid">
       <div class="funnel-card">
         <div class="funnel-title"><div class="funnel-dot" style="background:#2563eb;"></div>Hardware and Devices</div>
@@ -254,15 +254,7 @@ table.tos-tbl tbody tr.tbl-total td.proj-c { background: #e0effe; }
         <div class="frow"><span class="fkey">Opportunities needed (40% win rate)</span><span class="fval" id="f-hd-opps">-</span></div>
         <div class="frow"><span class="fkey">Weekly leads needed</span><span class="fval b" id="f-hd-leads">-</span></div>
       </div>
-      <div class="funnel-card">
-        <div class="funnel-title"><div class="funnel-dot" style="background:#059669;"></div>Professional Services (IXE)</div>
-        <div class="frow"><span class="fkey">2026 target</span><span class="fval g" id="f-ps-target">-</span></div>
-        <div class="frow"><span class="fkey">2025 actual revenue</span><span class="fval" id="f-ps-2025">-</span></div>
-        <div class="frow"><span class="fkey">Go-get number</span><span class="fval g" id="f-ps-goget">-</span></div>
-        <div class="frow"><span class="fkey">Avg annual customer value</span><span class="fval" id="f-ps-acv">-</span></div>
-        <div class="frow"><span class="fkey">New customers needed</span><span class="fval" id="f-ps-cust">-</span></div>
-        <div class="frow"><span class="fkey">Weekly leads needed</span><span class="fval g" id="f-ps-leads">-</span></div>
-      </div>
+      
     </div>
   </div>
 
