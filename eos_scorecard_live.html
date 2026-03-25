@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -266,7 +266,7 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
         <div class="frow"><span class="fkey">2026 target</span><span class="fval b" id="fHDTarget">-</span></div>
         <div class="frow"><span class="fkey">2025 actual revenue</span><span class="fval" id="fHDPrior">-</span></div>
         <div class="frow"><span class="fkey">Go-get number</span><span class="fval b" id="fHDGoGet">-</span></div>
-        <div class="frow"><span class="fkey">New customers needed</span><span class="fval" id="fHDCust">-</span></div>
+        <div class="frow"><span class="fkey">Weekly new customers needed</span><span class="fval" id="fHDCust">-</span></div>
         <div class="frow"><span class="fkey">Opportunities needed (40% win rate)</span><span class="fval" id="fHDOpps">-</span></div>
         <div class="frow"><span class="fkey">Weekly leads needed</span><span class="fval b" id="fHDLeads">-</span></div>
       </div>
@@ -874,7 +874,7 @@ document.getElementById('weekBadge').textContent = `Q1 2026 · ${latestMonth}` +
     document.getElementById('fHDTarget').textContent = fmt$(frow(9) || hdAnnual);
     document.getElementById('fHDPrior').textContent  = fmt$(frow(10));
     document.getElementById('fHDGoGet').textContent  = fmt$(frow(12));
-    document.getElementById('fHDCust').textContent   = Math.round(frow(15)) + ' customers';
+    document.getElementById('fHDCust').textContent   = (frow(15) / 52).toFixed(2) + ' / week';
     document.getElementById('fHDOpps').textContent   = Math.round(frow(16));
     document.getElementById('fHDLeads').textContent  = fmtN(frow(17), 1) + ' / week';
 
