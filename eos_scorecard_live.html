@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -70,9 +70,10 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
 /* Rocks */
 .rocks-grid { display: grid; gap: 6px; }
 .rock-row { display: grid; grid-template-columns: 1fr 130px 90px 90px; gap: 10px; align-items: center; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 7px; padding: 10px 14px; }
-.rock-row.on-track { border-color: #6ee7b7; background: #f0fdf4; }
-.rock-row.at-risk  { border-color: #fcd34d; background: #fffbeb; }
-.rock-row.missed   { border-color: #fca5a5; background: #fef2f2; }
+.rock-row.on-track    { border-color: #6ee7b7; background: #f0fdf4; }
+.rock-row.at-risk     { border-color: #fcd34d; background: #fffbeb; }
+.rock-row.missed      { border-color: #fca5a5; background: #fef2f2; }
+.rock-row.not-started { border-color: #e5e7eb; background: #ffffff; }
 .rock-name { font-size: 11px; font-weight: 500; color: #111827; line-height: 1.4; }
 .rock-note { font-size: 9px; color: #6b7280; margin-top: 2px; }
 .rock-owner { font-size: 10px; color: #6b7280; }
@@ -542,10 +543,12 @@ function buildRocks(rocks) {
   const atRisk  = rocks.filter(r => r.status === 'At Risk').length;
   const missed  = rocks.filter(r => r.status === 'Missed' || r.status === 'Off Track').length;
 
+  const notStarted = rocks.filter(r => r.status === 'Not Started').length;
   document.getElementById('rocksSummary').innerHTML =
     `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#065f46;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#059669;display:inline-block;"></span>${onTrack} On Track</div>` +
     `<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#d97706;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#d97706;display:inline-block;"></span>${atRisk} At Risk</div>` +
-    `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#b91c1c;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#dc2626;display:inline-block;"></span>${missed} Missed</div>`;
+    `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#b91c1c;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#dc2626;display:inline-block;"></span>${missed} Missed</div>` +
+    `<div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#6b7280;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#d1d5db;display:inline-block;"></span>${notStarted} Not Started</div>`;
 
   // Build HTML grouped by quarter
   return qKeys.map(q => {
@@ -553,14 +556,16 @@ function buildRocks(rocks) {
     const qOn = qRocks.filter(r => r.status === 'On Track').length;
     const qRisk = qRocks.filter(r => r.status === 'At Risk').length;
     const qMissed = qRocks.filter(r => r.status === 'Missed' || r.status === 'Off Track').length;
+    const qNotStarted = qRocks.filter(r => r.status === 'Not Started').length;
 
     const rowsHtml = qRocks.map(r => {
       const pct      = Math.round((parseFloat(r.pct) || 0) * 100);
-      const isMissed = r.status === 'Missed' || r.status === 'Off Track';
-      const isAtRisk = r.status === 'At Risk';
-      const cls    = isMissed ? 'missed'   : isAtRisk ? 'at-risk'  : 'on-track';
-      const dotCls = isMissed ? 'r'        : isAtRisk ? 'y'        : 'g';
-      const color  = isMissed ? '#dc2626'  : isAtRisk ? '#d97706'  : '#15803d';
+      const isMissed     = r.status === 'Missed' || r.status === 'Off Track';
+      const isAtRisk     = r.status === 'At Risk';
+      const isNotStarted = r.status === 'Not Started';
+      const cls    = isMissed ? 'missed' : isAtRisk ? 'at-risk' : isNotStarted ? 'not-started' : 'on-track';
+      const dotCls = isMissed ? 'r'      : isAtRisk ? 'y'       : isNotStarted ? 'n'           : 'g';
+      const color  = isMissed ? '#dc2626': isAtRisk ? '#d97706' : isNotStarted ? '#6b7280'     : '#15803d';
       const statusLabel = r.status || 'On Track';
       return `<div class="rock-row ${cls}">
         <div>
@@ -583,6 +588,7 @@ function buildRocks(rocks) {
           <span style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;color:#065f46;">${qOn} On Track</span>
           ${qRisk ? `<span style="background:#fffbeb;border:1px solid #fcd34d;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;color:#d97706;">${qRisk} At Risk</span>` : ''}
           ${qMissed ? `<span style="background:#fee2e2;border:1px solid #fca5a5;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;color:#b91c1c;">${qMissed} Missed</span>` : ''}
+          ${qNotStarted ? `<span style="background:#ffffff;border:1px solid #e5e7eb;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;color:#6b7280;">${qNotStarted} Not Started</span>` : ''}
         </div>
       </div>
       ${rowsHtml}
