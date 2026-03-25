@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -70,8 +70,9 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
 /* Rocks */
 .rocks-grid { display: grid; gap: 6px; }
 .rock-row { display: grid; grid-template-columns: 1fr 130px 90px 90px; gap: 10px; align-items: center; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 7px; padding: 10px 14px; }
-.rock-row.at-risk { border-color: #fca5a5; background: #fef2f2; }
-.rock-row.complete { border-color: #6ee7b7; background: #f0fdf4; }
+.rock-row.on-track { border-color: #6ee7b7; background: #f0fdf4; }
+.rock-row.at-risk  { border-color: #fcd34d; background: #fffbeb; }
+.rock-row.missed   { border-color: #fca5a5; background: #fef2f2; }
 .rock-name { font-size: 11px; font-weight: 500; color: #111827; line-height: 1.4; }
 .rock-note { font-size: 9px; color: #6b7280; margin-top: 2px; }
 .rock-owner { font-size: 10px; color: #6b7280; }
@@ -521,26 +522,31 @@ function buildScorecardTable(rows, weekCols) {
 function buildRocks(rocks) {
   const onTrack = rocks.filter(r => r.status === 'On Track').length;
   const atRisk  = rocks.filter(r => r.status === 'At Risk').length;
+  const missed  = rocks.filter(r => r.status === 'Missed' || r.status === 'Off Track').length;
 
+  // Legend badges - always show all three with counts
   document.getElementById('rocksSummary').innerHTML =
-    `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#065f46;">${onTrack} On Track</div>` +
-    (atRisk ? `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#b91c1c;">${atRisk} At Risk</div>` : '');
+    `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#065f46;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#059669;display:inline-block;"></span>${onTrack} On Track</div>` +
+    `<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#d97706;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#d97706;display:inline-block;"></span>${atRisk} At Risk</div>` +
+    `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#b91c1c;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#dc2626;display:inline-block;"></span>${missed} Missed</div>`;
 
   return rocks.map(r => {
-    const pct = Math.round((parseFloat(r.pct) || 0) * 100);
-    const isAtRisk = r.status === 'At Risk';
-    const isDone   = pct >= 100;
-    const cls      = isDone ? 'complete' : isAtRisk ? 'at-risk' : '';
-    const dotCls   = isDone || r.status === 'On Track' ? 'g' : isAtRisk ? (pct < 50 ? 'r' : 'y') : 'n';
-    const barCls   = dotCls;
-    const color    = dotCls === 'g' ? '#15803d' : dotCls === 'y' ? '#d97706' : '#dc2626';
+    const pct     = Math.round((parseFloat(r.pct) || 0) * 100);
+    const isOnTrack = r.status === 'On Track';
+    const isAtRisk  = r.status === 'At Risk';
+    const isMissed  = r.status === 'Missed' || r.status === 'Off Track';
+    const cls    = isMissed ? 'missed' : isAtRisk ? 'at-risk' : 'on-track';
+    const dotCls = isMissed ? 'r' : isAtRisk ? 'y' : 'g';
+    const barCls = dotCls;
+    const color  = isMissed ? '#dc2626' : isAtRisk ? '#d97706' : '#15803d';
+    const statusLabel = r.status || 'On Track';
     return `<div class="rock-row ${cls}">
       <div>
         <div class="rock-name">${r.name}</div>
         ${r.notes ? `<div class="rock-note">${r.notes}</div>` : ''}
       </div>
       <div class="rock-owner">${r.owner}</div>
-      <div><span class="rock-status" style="color:${color};"><span class="dot ${dotCls}"></span>${r.status}</span></div>
+      <div><span class="rock-status" style="color:${color};"><span class="dot ${dotCls}"></span>${statusLabel}</span></div>
       <div>
         <div class="rock-pct" style="color:${color};">${pct}%</div>
         <div class="prog-bar"><div class="prog-fill ${barCls}" style="width:${pct}%;"></div></div>
