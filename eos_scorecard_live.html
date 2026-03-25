@@ -467,9 +467,15 @@ function fmt$(n) {
 function fmtN(n, dec=1) { return isNaN(n) ? '-' : Number(n).toFixed(dec); }
 
 function ragClass(actual, target, lowerIsBetter=false) {
-  if (!actual || !target || target === 0) return 'n';
+  if (actual === null || actual === undefined || isNaN(actual)) return 'n';
+  if (lowerIsBetter) {
+    // target=0: anything above 0 is red, 0 is green
+    if (target === 0 || target === null) return actual === 0 ? 'g' : 'r';
+    // target>0: below target = green, at/above target = red, no amber buffer
+    return actual < target ? 'g' : actual === target ? 'r' : 'r';
+  }
+  if (target === null || target === undefined || isNaN(target) || target === 0) return 'n';
   const ratio = actual / target;
-  if (lowerIsBetter) return actual <= target ? 'g' : actual <= target * 1.1 ? 'y' : 'r';
   return ratio >= 1 ? 'g' : ratio >= 0.9 ? 'y' : 'r';
 }
 
@@ -502,7 +508,7 @@ function buildScorecardTable(rows, weekCols) {
     const targetStr  = String(target || '');
     const isPct      = targetStr.includes('%') || measure.toLowerCase().includes('a/r') || measure.toLowerCase().includes('margin');
     const tgt        = isPct ? parseFloat(targetStr) / (targetStr.includes('%') ? 100 : 1) : (parseFloat(target) ?? 0);
-    const tgtNum     = isNaN(tgt) ? null : tgt;
+    const tgtNum     = isNaN(tgt) ? null : tgt;  // NOTE: 0 is a valid target for lower-is-better metrics
     const lower      = measure && (measure.toLowerCase().includes('breach') || measure.toLowerCase().includes('return') || measure.toLowerCase().includes('strike') || measure.toLowerCase().includes('a/r'));
 
     // Format a value for display — handle percentages, currency, plain numbers, and zero
