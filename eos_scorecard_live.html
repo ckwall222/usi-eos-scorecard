@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -247,7 +247,7 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
 
   <!-- Rocks -->
   <div class="sec">
-    <div class="slbl">Q1 2026 rocks &nbsp;·&nbsp; due March 31, 2026</div>
+    <div class="slbl">Rocks &nbsp;·&nbsp; by quarter</div>
     <div id="rocksSummary" style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;"></div>
     <div class="rocks-grid" id="rocksGrid">
       <div class="loading-overlay"><div class="spinner"></div><span>Loading rocks...</span></div>
@@ -520,37 +520,72 @@ function buildScorecardTable(rows, weekCols) {
 }
 
 function buildRocks(rocks) {
+  // Group by quarter (col G = period e.g. 'Q12026', 'Q22026')
+  const quarters = {};
+  rocks.forEach(r => {
+    const q = r.period || 'Unknown';
+    if (!quarters[q]) quarters[q] = [];
+    quarters[q].push(r);
+  });
+
+  // Sort quarters chronologically
+  const qKeys = Object.keys(quarters).sort((a, b) => {
+    const parse = s => { const m = s.match(/(Q\d)(\d{4})/i); return m ? parseInt(m[2])*10 + parseInt(m[1][1]) : 0; };
+    return parse(a) - parse(b);
+  });
+
+  // Format quarter label e.g. 'Q12026' -> 'Q1 2026'
+  const qLabel = q => q.replace(/(Q\d)(\d{4})/i, '$1 $2');
+
+  // Overall legend counts across all quarters
   const onTrack = rocks.filter(r => r.status === 'On Track').length;
   const atRisk  = rocks.filter(r => r.status === 'At Risk').length;
   const missed  = rocks.filter(r => r.status === 'Missed' || r.status === 'Off Track').length;
 
-  // Legend badges - always show all three with counts
   document.getElementById('rocksSummary').innerHTML =
     `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#065f46;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#059669;display:inline-block;"></span>${onTrack} On Track</div>` +
     `<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#d97706;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#d97706;display:inline-block;"></span>${atRisk} At Risk</div>` +
     `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;color:#b91c1c;display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:#dc2626;display:inline-block;"></span>${missed} Missed</div>`;
 
-  return rocks.map(r => {
-    const pct     = Math.round((parseFloat(r.pct) || 0) * 100);
-    const isOnTrack = r.status === 'On Track';
-    const isAtRisk  = r.status === 'At Risk';
-    const isMissed  = r.status === 'Missed' || r.status === 'Off Track';
-    const cls    = isMissed ? 'missed' : isAtRisk ? 'at-risk' : 'on-track';
-    const dotCls = isMissed ? 'r' : isAtRisk ? 'y' : 'g';
-    const barCls = dotCls;
-    const color  = isMissed ? '#dc2626' : isAtRisk ? '#d97706' : '#15803d';
-    const statusLabel = r.status || 'On Track';
-    return `<div class="rock-row ${cls}">
-      <div>
-        <div class="rock-name">${r.name}</div>
-        ${r.notes ? `<div class="rock-note">${r.notes}</div>` : ''}
+  // Build HTML grouped by quarter
+  return qKeys.map(q => {
+    const qRocks = quarters[q];
+    const qOn = qRocks.filter(r => r.status === 'On Track').length;
+    const qRisk = qRocks.filter(r => r.status === 'At Risk').length;
+    const qMissed = qRocks.filter(r => r.status === 'Missed' || r.status === 'Off Track').length;
+
+    const rowsHtml = qRocks.map(r => {
+      const pct      = Math.round((parseFloat(r.pct) || 0) * 100);
+      const isMissed = r.status === 'Missed' || r.status === 'Off Track';
+      const isAtRisk = r.status === 'At Risk';
+      const cls    = isMissed ? 'missed'   : isAtRisk ? 'at-risk'  : 'on-track';
+      const dotCls = isMissed ? 'r'        : isAtRisk ? 'y'        : 'g';
+      const color  = isMissed ? '#dc2626'  : isAtRisk ? '#d97706'  : '#15803d';
+      const statusLabel = r.status || 'On Track';
+      return `<div class="rock-row ${cls}">
+        <div>
+          <div class="rock-name">${r.name}</div>
+          ${r.notes ? `<div class="rock-note">${r.notes}</div>` : ''}
+        </div>
+        <div class="rock-owner">${r.owner}</div>
+        <div><span class="rock-status" style="color:${color};"><span class="dot ${dotCls}"></span>${statusLabel}</span></div>
+        <div>
+          <div class="rock-pct" style="color:${color};">${pct}%</div>
+          <div class="prog-bar"><div class="prog-fill ${dotCls}" style="width:${pct}%;"></div></div>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div style="margin-bottom:18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:12px;font-weight:700;color:#111827;text-transform:uppercase;letter-spacing:0.08em;">${qLabel(q)}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;color:#065f46;">${qOn} On Track</span>
+          ${qRisk ? `<span style="background:#fffbeb;border:1px solid #fcd34d;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;color:#d97706;">${qRisk} At Risk</span>` : ''}
+          ${qMissed ? `<span style="background:#fee2e2;border:1px solid #fca5a5;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:600;color:#b91c1c;">${qMissed} Missed</span>` : ''}
+        </div>
       </div>
-      <div class="rock-owner">${r.owner}</div>
-      <div><span class="rock-status" style="color:${color};"><span class="dot ${dotCls}"></span>${statusLabel}</span></div>
-      <div>
-        <div class="rock-pct" style="color:${color};">${pct}%</div>
-        <div class="prog-bar"><div class="prog-fill ${barCls}" style="width:${pct}%;"></div></div>
-      </div>
+      ${rowsHtml}
     </div>`;
   }).join('');
 }
@@ -728,7 +763,7 @@ async function loadDashboard() {
     // Read Scorecard sheet rows 1-30, cols A-S
     const [scoreRange, rocksRange, funnelRange] = await Promise.all([
       getExcelRange(token, driveId, itemId, 'EOS Scorecard Tracking', 'A1:S36'),
-      getExcelRange(token, driveId, itemId, 'Rocks ScoreCard', 'A1:H8'),
+      getExcelRange(token, driveId, itemId, 'Rocks ScoreCard', 'A1:H30'),
       getExcelRange(token, driveId, itemId, ' Funnel Assumptions', 'B6:C32')
     ]);
 
@@ -790,8 +825,9 @@ document.getElementById('weekBadge').textContent = `Q1 2026 · ${latestMonth}` +
     const rocks = rv.slice(1).filter(r => r[0]).map(r => ({
       name:   String(r[0]).trim(),
       owner:  String(r[1] || ''),
-      status: String(r[4] || 'Unknown'),
+      status: String(r[4] || 'On Track'),
       pct:    parseFloat(r[5]) || 0,
+      period: String(r[6] || 'Q12026').trim(),
       notes:  String(r[7] || '')
     }));
     document.getElementById('rocksGrid').innerHTML = buildRocks(rocks);
