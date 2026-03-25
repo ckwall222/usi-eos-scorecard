@@ -505,11 +505,11 @@ function buildScorecardTable(rows, weekCols) {
       lastCat = cat;
     }
     // Detect if this is a percentage metric (target is text like '<5%' or value is a small decimal)
-    const targetStr  = String(target || '');
+    const targetStr  = (target === 0 || target === '0') ? '0' : String(target || '');
     const isPct      = targetStr.includes('%') || measure.toLowerCase().includes('a/r') || measure.toLowerCase().includes('margin');
     const tgt        = isPct ? parseFloat(targetStr) / (targetStr.includes('%') ? 100 : 1) : (parseFloat(target) ?? 0);
     const tgtNum     = isNaN(tgt) ? null : tgt;  // NOTE: 0 is a valid target for lower-is-better metrics
-    const lower      = measure && (measure.toLowerCase().includes('breach') || measure.toLowerCase().includes('return') || measure.toLowerCase().includes('strike') || measure.toLowerCase().includes('a/r'));
+    const lower      = measure && (measure.toLowerCase().includes('breach') || measure.toLowerCase().includes('sla') || measure.toLowerCase().includes('return') || measure.toLowerCase().includes('strike') || measure.toLowerCase().includes('a/r'));
 
     // Format a value for display — handle percentages, currency, plain numbers, and zero
     const fmtVal = (v) => {
