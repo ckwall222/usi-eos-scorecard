@@ -126,6 +126,29 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
 .live-dot { width:5px; height:5px; border-radius:50%; background:#059669; animation:pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 .data-error { background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; padding:10px 14px; font-size:11px; color:#b91c1c; margin-bottom:10px; }
+
+/* ── TechOS P&L Section ── */
+.tos-banner { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); border-radius: 10px; padding: 1.5rem; margin-bottom: 14px; color: #fff; }
+.tos-banner-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.tos-banner-title { font-size: 18px; font-weight: 700; color: #fff; }
+.tos-banner-title span { color: #34d399; }
+.tos-banner-sub { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 4px; }
+.tos-pct-big { font-size: 40px; font-weight: 800; color: #34d399; letter-spacing: -0.02em; line-height: 1; }
+.tos-pct-lbl { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.07em; margin-top: 3px; }
+.tos-prog-track { height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+.tos-prog-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #059669, #34d399); transition: width 0.8s ease; }
+.tos-prog-labels { display: flex; justify-content: space-between; font-size: 9px; color: rgba(255,255,255,0.3); }
+.tos-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+.tos-kpi { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.875rem 1rem; }
+.tos-kpi.proj { border-color: #93c5fd; background: #eff6ff; border-style: dashed; }
+.tos-knum { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; color: #111827; }
+.tos-knum.pos { color: #15803d; } .tos-knum.neg { color: #dc2626; } .tos-knum.amb { color: #d97706; }
+.tos-klbl { font-size: 10px; color: #6b7280; margin-top: 4px; line-height: 1.3; }
+.tos-ksub { font-size: 9px; color: #9ca3af; margin-top: 3px; }
+.tos-kbadge { font-size: 8px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; padding: 1px 5px; border-radius: 2px; margin-top: 4px; display: inline-block; }
+.tos-kbadge.act  { background: #d1fae5; color: #065f46; }
+.tos-kbadge.proj { background: #dbeafe; color: #1e3a8a; }
+.tos-charts { display: grid; grid-template-columns: 3fr 2fr; gap: 10px; }
 </style>
 </head>
 <body>
@@ -257,6 +280,83 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
       </div>
     </div>
   </div>
+
+  <hr class="divider">
+
+  <!-- TechOS P&L -->
+  <div class="sec">
+    <div class="slbl">TechOS division &nbsp;·&nbsp; monthly P&amp;L &nbsp;·&nbsp; EOS VTO goal: 20% of total USI revenue</div>
+
+    <div class="tos-banner">
+      <div class="tos-banner-top">
+        <div>
+          <div class="tos-banner-title">TechOS &nbsp;·&nbsp; <span>Path to 20%</span></div>
+          <div class="tos-banner-sub">EOS VTO target: TechOS becomes no less than 20% of total USI revenue ($19.3M). Monthly invoicing cadence.</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="tos-pct-big" id="tos-pct-actual">-</div>
+          <div class="tos-pct-lbl">Annualized % of USI revenue (YTD)</div>
+        </div>
+      </div>
+      <div class="tos-prog-track"><div class="tos-prog-fill" id="tos-progress-bar" style="width:0%;"></div></div>
+      <div class="tos-prog-labels">
+        <span>0%</span>
+        <span id="tos-progress-marker" style="color:rgba(52,211,153,0.8);">▲ Current</span>
+        <span style="color:#34d399;font-weight:700;">20% goal</span>
+      </div>
+    </div>
+
+    <div class="tos-kpis">
+      <div class="tos-kpi">
+        <div class="tos-knum" id="tos-jan-rev">-</div>
+        <div class="tos-klbl">January revenue</div>
+        <div class="tos-knum" style="font-size:15px;margin-top:6px;" id="tos-jan-ni">-</div>
+        <div class="tos-ksub">NI w/ overhead</div>
+        <span class="tos-kbadge act">Actual</span>
+      </div>
+      <div class="tos-kpi">
+        <div class="tos-knum" id="tos-feb-rev">-</div>
+        <div class="tos-klbl">February revenue</div>
+        <div class="tos-knum" style="font-size:15px;margin-top:6px;" id="tos-feb-ni">-</div>
+        <div class="tos-ksub">NI w/ overhead</div>
+        <span class="tos-kbadge act">Actual</span>
+      </div>
+      <div class="tos-kpi">
+        <div class="tos-knum" id="tos-mar-rev">-</div>
+        <div class="tos-klbl">March revenue</div>
+        <div class="tos-knum" style="font-size:15px;margin-top:6px;" id="tos-mar-ni">-</div>
+        <div class="tos-ksub">NI w/ overhead</div>
+        <span class="tos-kbadge act">Actual</span>
+      </div>
+      <div class="tos-kpi proj">
+        <div class="tos-knum pos" id="tos-q2-ni">-</div>
+        <div class="tos-klbl">Q2 projected NI (signed contracts)</div>
+        <div class="tos-knum pos" style="font-size:15px;margin-top:6px;" id="tos-may-ni">-</div>
+        <div class="tos-ksub">May — first profitable month</div>
+        <span class="tos-kbadge proj">Projected</span>
+      </div>
+    </div>
+
+    <div class="tos-charts">
+      <div class="chart-box" style="margin-bottom:0;">
+        <div class="chart-lbl">
+          TechOS revenue &amp; NI — Jan through Jun (actuals + projections)
+          <div class="legend">
+            <div class="li"><span style="width:8px;height:8px;border-radius:2px;background:rgba(5,150,105,0.55);display:inline-block;"></span>Rev actual</div>
+            <div class="li"><span style="width:8px;height:8px;border-radius:2px;background:rgba(5,150,105,0.2);border:1px dashed #059669;display:inline-block;"></span>Rev proj</div>
+            <div class="li"><span style="width:14px;border-top:2px solid #1d4ed8;display:inline-block;"></span>NI actual</div>
+            <div class="li"><span style="width:14px;border-top:2px dashed #1d4ed8;display:inline-block;"></span>NI proj</div>
+          </div>
+        </div>
+        <div style="position:relative;height:220px;"><canvas id="tosRevChart"></canvas></div>
+      </div>
+      <div class="chart-box" style="margin-bottom:0;">
+        <div class="chart-lbl">TechOS % of monthly USI revenue — path to 20% goal</div>
+        <div style="position:relative;height:220px;"><canvas id="tosPctChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
 
 </div>
 </div>
@@ -601,6 +701,21 @@ async function loadDashboard() {
     document.getElementById('fPSOpps').textContent   = Math.round(fmap['Opportunities Needed (30% win rate)'] || 0);
     document.getElementById('fPSLeads').textContent  = fmtN(fmap['Weekly Leads Needed'] || 0,1) + ' / week';
 
+    // ── Load TechOS P&L from Finance SharePoint site
+    try {
+      const finSite   = await graphGet(token, '/sites/universalsystemsinc100.sharepoint.com:/sites/Finance');
+      const finDrive  = await graphGet(token, `/sites/${finSite.id}/drive`);
+      const finSearch = await graphGet(token, `/drives/${finDrive.id}/root/search(q='TechOS%20PL')`);
+      const finFile   = finSearch.value.find(f => f.name === 'TechOS PL updated.xlsx') || finSearch.value[0];
+      if (!finFile) throw new Error('TechOS PL updated.xlsx not found in Finance site.');
+      const finBase   = `/drives/${finDrive.id}/items/${finFile.id}/workbook`;
+      const finSheet  = await graphGet(token, finBase + "/worksheets('Sheet1')/usedRange");
+      renderTechOS(finSheet.values);
+    } catch(e) {
+      console.warn('TechOS P&L load failed:', e.message);
+      renderTechOS(null);
+    }
+
     show('reportView');
 
   } catch(err) {
@@ -638,6 +753,94 @@ function show(id) {
     console.error(e);
     show('loginView');
   }
+
+function renderTechOS(v) {
+  const USI_ANNUAL = 19343037;
+  const f = (n) => {
+    if (n === null || n === undefined || isNaN(n)) return '-';
+    const abs = Math.abs(n), sign = n < 0 ? '-$' : '$';
+    if (abs >= 1e6) return sign + (abs/1e6).toFixed(2) + 'M';
+    if (abs >= 1e3) return sign + Math.round(abs/1e3).toLocaleString() + 'K';
+    return sign + Math.round(abs).toLocaleString();
+  };
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setNI = (id, n) => {
+    const el = document.getElementById(id); if (!el) return;
+    el.textContent = f(n);
+    el.className = 'tos-knum ' + (n > 500 ? 'pos' : n < -5000 ? 'neg' : 'amb');
+  };
+
+  if (!v) { set('tos-pct-actual', 'N/A'); return; }
+
+  const r = (row, col) => parseFloat(v[row]?.[col]) || 0;
+  const janRev = r(9,1),  febRev = r(9,3),  marRev = r(9,5);
+  const janNI  = r(26,1), febNI  = r(26,3), marNI  = r(26,5);
+  const aprNI  = r(30,7), mayNI  = r(30,9), junNI  = r(30,11);
+  const q2NI   = aprNI + mayNI + junNI;
+
+  const annualized = ((janRev + febRev + marRev) / 3) * 12;
+  const pctActual  = (annualized / USI_ANNUAL) * 100;
+
+  set('tos-pct-actual', pctActual.toFixed(1) + '%');
+  const barW = Math.min((pctActual / 20) * 100, 100);
+  document.getElementById('tos-progress-bar').style.width = barW + '%';
+  document.getElementById('tos-progress-marker').textContent = '▲ ' + pctActual.toFixed(1) + '%';
+
+  set('tos-jan-rev', f(janRev)); setNI('tos-jan-ni', janNI);
+  set('tos-feb-rev', f(febRev)); setNI('tos-feb-ni', febNI);
+  set('tos-mar-rev', f(marRev)); setNI('tos-mar-ni', marNI);
+
+  const q2El = document.getElementById('tos-q2-ni');
+  if (q2El) { q2El.textContent = f(q2NI); q2El.className = 'tos-knum ' + (q2NI > 0 ? 'pos' : 'neg'); }
+  const mayEl = document.getElementById('tos-may-ni');
+  if (mayEl) { mayEl.textContent = f(mayNI); }
+
+  const gc = 'rgba(0,0,0,0.06)', lc = '#374151';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun'];
+  const revAct  = [janRev, febRev, marRev, null, null, null];
+  const revProj = [null, null, marRev, r(9,7)||marRev, r(9,9)||marRev, r(9,11)||marRev];
+  const niAct   = [janNI, febNI, marNI, null, null, null];
+  const niProj  = [null, null, marNI, aprNI, mayNI, junNI];
+
+  if (window.tosRevChartInst) window.tosRevChartInst.destroy();
+  window.tosRevChartInst = new Chart(document.getElementById('tosRevChart'), {
+    data: { labels: months, datasets: [
+      { type:'bar',  label:'Rev actual', data:revAct,  backgroundColor:'rgba(5,150,105,0.5)', borderColor:'#059669', borderWidth:1, borderRadius:3, barPercentage:0.5, yAxisID:'yR', order:2 },
+      { type:'bar',  label:'Rev proj',   data:revProj, backgroundColor:'rgba(5,150,105,0.18)', borderColor:'rgba(5,150,105,0.5)', borderWidth:1, borderRadius:3, barPercentage:0.5, yAxisID:'yR', order:2 },
+      { type:'line', label:'NI actual',  data:niAct,   borderColor:'#1d4ed8', pointBackgroundColor:'#1d4ed8', pointRadius:5, tension:0.3, yAxisID:'yN', order:1, spanGaps:false, fill:false },
+      { type:'line', label:'NI proj',    data:niProj,  borderColor:'#1d4ed8', pointBackgroundColor:'#1d4ed8', pointRadius:5, borderDash:[5,4], tension:0.3, yAxisID:'yN', order:1, spanGaps:false, fill:false }
+    ]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: c => c.raw === null ? null : c.dataset.label + ': ' + f(c.raw) }}},
+      scales:{
+        x:{ grid:{color:gc}, ticks:{color:lc} },
+        yR:{ position:'left',  grid:{color:gc}, ticks:{color:lc, callback:v=>'$'+Math.round(v/1000)+'K'} },
+        yN:{ position:'right', grid:{drawOnChartArea:false}, ticks:{color:lc, callback:v=>(v<0?'-$':'$')+Math.abs(Math.round(v/1000))+'K'} }
+      }
+    }
+  });
+
+  const monthlyPcts = [janRev, febRev, marRev].map(rv => parseFloat(((rv / (USI_ANNUAL/12)) * 100).toFixed(1)));
+  if (window.tosPctChartInst) window.tosPctChartInst.destroy();
+  window.tosPctChartInst = new Chart(document.getElementById('tosPctChart'), {
+    type:'bar',
+    data:{ labels:['January','February','March'], datasets:[
+      { label:'TechOS %', data:monthlyPcts,
+        backgroundColor: monthlyPcts.map(p => p>=20?'rgba(5,150,105,0.5)':p>=10?'rgba(217,119,6,0.4)':'rgba(220,38,38,0.4)'),
+        borderColor:      monthlyPcts.map(p => p>=20?'#059669':p>=10?'#d97706':'#dc2626'),
+        borderWidth:1, borderRadius:4, barPercentage:0.5 }
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: c => 'TechOS share: '+c.raw+'%' }}},
+      scales:{ x:{grid:{color:gc},ticks:{color:lc}}, y:{grid:{color:gc},ticks:{color:lc,callback:v=>v+'%'},max:25} }
+    }
+  });
+  window.tosPctChartInst.data.datasets.push({ type:'line', label:'20% goal', data:[20,20,20], borderColor:'#dc2626', borderDash:[5,4], borderWidth:1.5, pointRadius:0, fill:false });
+  window.tosPctChartInst.update();
+}
+
 })();
 </script>
 </body>
