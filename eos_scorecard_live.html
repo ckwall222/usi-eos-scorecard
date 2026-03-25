@@ -870,22 +870,23 @@ document.getElementById('weekBadge').textContent = `Q1 2026 · ${latestMonth}` +
     const fv2 = fv; // alias for clarity
     const frow = (idx) => parseFloat(fv2[idx]?.[1]) || 0;
 
-    // H&D section (rows 10-18, 0-based idx 9-17)
-    document.getElementById('fHDTarget').textContent = fmt$(frow(9) || hdAnnual);
-    document.getElementById('fHDPrior').textContent  = fmt$(frow(10));
-    document.getElementById('fHDGoGet').textContent  = fmt$(frow(12));
-    document.getElementById('fHDCust').textContent   = (frow(15) / 52).toFixed(2) + ' / week';
-    document.getElementById('fHDOpps').textContent   = Math.round(frow(16));
-    document.getElementById('fHDLeads').textContent  = fmtN(frow(17), 1) + ' / week';
+    // H&D section — indices based on B6:C32 range
+    // idx 4=H&D Target, 5=2025 Rev, 7=Go-Get, 10=New Cust(annual), 11=Opps, 12=Leads
+    document.getElementById('fHDTarget').textContent = fmt$(frow(4) || hdAnnual);
+    document.getElementById('fHDPrior').textContent  = fmt$(frow(5));
+    document.getElementById('fHDGoGet').textContent  = fmt$(frow(7));
+    document.getElementById('fHDCust').textContent   = (frow(10) / 52).toFixed(2) + ' / week';
+    document.getElementById('fHDOpps').textContent   = Math.round(frow(11));
+    document.getElementById('fHDLeads').textContent  = fmtN(frow(12), 1) + ' / week';
 
-    // IXE/PS section (rows 20-26, 0-based idx 19-25)
-    document.getElementById('fPSTarget').textContent = fmt$(frow(19) || psAnnual);
-    document.getElementById('fPSPrior').textContent  = fmt$(frow(20));
-    document.getElementById('fPSGoGet').textContent  = fmt$(frow(22));
-    document.getElementById('fPSACV').textContent    = fmt$(frow(21));
-    document.getElementById('fPSCust').textContent   = Math.round(frow(23)) + ' customers';
-    document.getElementById('fPSOpps').textContent   = Math.round(frow(24));
-    document.getElementById('fPSLeads').textContent  = fmtN(frow(25), 1) + ' / week';
+    // IXE/PS section — idx 14=IXE Target, 15=2025 Rev, 16=ACV, 17=Go-Get, 18=New Cust, 19=Opps, 20=Leads
+    document.getElementById('fPSTarget').textContent = fmt$(frow(14) || psAnnual);
+    document.getElementById('fPSPrior').textContent  = fmt$(frow(15));
+    document.getElementById('fPSGoGet').textContent  = fmt$(frow(17));
+    document.getElementById('fPSACV').textContent    = fmt$(frow(16));
+    document.getElementById('fPSCust').textContent   = Math.round(frow(18)) + ' customers';
+    document.getElementById('fPSOpps').textContent   = Math.round(frow(19));
+    document.getElementById('fPSLeads').textContent  = fmtN(frow(20), 1) + ' / week';
 
     // ── Load TechOS P&L from Finance SharePoint site
     try {
