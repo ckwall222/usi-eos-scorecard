@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -701,7 +701,7 @@ async function loadDashboard() {
 
     // Read Scorecard sheet rows 1-30, cols A-S
     const [scoreRange, rocksRange, funnelRange] = await Promise.all([
-      getExcelRange(token, driveId, itemId, 'EOS Scorecard Tracking', 'A1:S30'),
+      getExcelRange(token, driveId, itemId, 'EOS Scorecard Tracking', 'A1:S36'),
       getExcelRange(token, driveId, itemId, 'Rocks ScoreCard', 'A1:H8'),
       getExcelRange(token, driveId, itemId, ' Funnel Assumptions', 'B6:C32')
     ]);
@@ -742,7 +742,7 @@ async function loadDashboard() {
 
     // ── Build scorecard rows (rows 17-30 = indices 16-29)
     const metricRows = [];
-    for (let i = 16; i < 30; i++) {
+    for (let i = 16; i < 35; i++) {
       const row = sv[i];
       if (!row[1] && !row[0]) continue;
       const weekVals = weekColIdxs.map(ci => row[ci] || 0);
@@ -752,7 +752,7 @@ async function loadDashboard() {
 
     // ── Charts
     const hdActuals = weekColIdxs.map(ci => parseFloat(sv[16][ci]) || 0);
-    const psActuals = weekColIdxs.map(ci => parseFloat(sv[20][ci]) || 0);
+    const psActuals = weekColIdxs.map(ci => parseFloat(sv[21][ci]) || 0);
     buildCharts(
       { actuals: hdActuals, target: hdWeekly },
       { actuals: psActuals, target: psWeekly },
