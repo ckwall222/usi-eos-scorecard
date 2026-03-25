@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>USI L10 Scorecard</title>
 <style>
@@ -259,7 +262,7 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-authentication-library-for-js/2.36.0/msal-browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
 <script>
 // ── CONFIG — update CLIENT_ID after Azure app registration ──
 const CONFIG = {
@@ -292,7 +295,7 @@ async function getToken() {
     const res = await msalApp.acquireTokenSilent({ scopes: SCOPES, account: accounts[0] });
     return res.accessToken;
   } catch {
-    const res = await msalApp.acquireTokenPopup({ scopes: SCOPES });
+    await msalApp.loginRedirect({ scopes: SCOPES }); return;
     return res.accessToken;
   }
 }
@@ -572,13 +575,13 @@ function show(id) {
 
 async function signIn() {
   try {
-    await msalApp.loginPopup({ scopes: SCOPES });
+    await msalApp.loginRedirect({ scopes: SCOPES });
     loadDashboard();
   } catch(e) { console.error(e); }
 }
 
 function signOut() {
-  msalApp.logoutPopup();
+  msalApp.logoutRedirect();
   show('loginView');
 }
 
