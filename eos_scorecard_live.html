@@ -262,42 +262,85 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
 <script>
-// ── CONFIG — update CLIENT_ID after Azure app registration ──
-const CONFIG = {
-  clientId:     'YOUR_CLIENT_ID_HERE',   // <-- paste Azure app ID here
-  tenantId:     'common',
-  siteHost:     'universalsystemsinc100.sharepoint.com',
-  sitePath:     '/sites/L10',
-  filePath:     '/sites/L10/Shared Documents/EOS Scorecard Data Sheet.xlsx',
-  sheetScorecard: 'EOS Scorecard Tracking',
-  sheetRocks:     'Rocks ScoreCard',
-  sheetFunnel:    ' Funnel Assumptions'
-};
-
-const msalApp = new msal.PublicClientApplication({
-  auth: {
-    clientId: CONFIG.clientId,
-    authority: `https://login.microsoftonline.com/${CONFIG.tenantId}`,
-    redirectUri: window.location.href.split('?')[0]
-  },
-  cache: { cacheLocation: 'sessionStorage' }
-});
-
-const SCOPES = ['Files.Read.All', 'Sites.Read.All'];
+// ── CONFIG ──
+const CLIENT_ID = '3565db63-2a61-4eaf-a84e-7577e5369a5c';
+const TENANT_ID = '53e2c3bd-d5d4-443d-bd75-e93b8d6a32c1';
+const SCOPES    = 'Files.Read.All Sites.Read.All User.Read';
+const REDIRECT  = window.location.href.split('?')[0].split('#')[0];
 let hdChartInst, psChartInst;
 
+// ── Pure PKCE OAuth2 — no external library ──
+function b64url(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+async function pkceChallenge() {
+  const verifier = b64url(crypto.getRandomValues(new Uint8Array(32)));
+  const digest   = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+  return { verifier, challenge: b64url(digest) };
+}
+
 async function getToken() {
-  const accounts = msalApp.getAllAccounts();
-  if (accounts.length === 0) throw new Error('Not signed in');
-  try {
-    const res = await msalApp.acquireTokenSilent({ scopes: SCOPES, account: accounts[0] });
-    return res.accessToken;
-  } catch {
-    await msalApp.loginRedirect({ scopes: SCOPES }); return;
-    return res.accessToken;
+  const token = sessionStorage.getItem('usi_token');
+  const expiry = parseInt(sessionStorage.getItem('usi_token_exp') || '0');
+  if (token && Date.now() < expiry) return token;
+  // Token expired or missing — redirect to login
+  await signIn();
+  throw new Error('Redirecting to login...');
+}
+
+async function signIn() {
+  const { verifier, challenge } = await pkceChallenge();
+  sessionStorage.setItem('pkce_verifier', verifier);
+  sessionStorage.setItem('pkce_state', b64url(crypto.getRandomValues(new Uint8Array(8))));
+  const params = new URLSearchParams({
+    client_id:             CLIENT_ID,
+    response_type:         'code',
+    redirect_uri:          REDIRECT,
+    scope:                 SCOPES,
+    code_challenge:        challenge,
+    code_challenge_method: 'S256',
+    state:                 sessionStorage.getItem('pkce_state'),
+    response_mode:         'query'
+  });
+  window.location = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/authorize?${params}`;
+}
+
+function signOut() {
+  sessionStorage.clear();
+  show('loginView');
+  window.location = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${encodeURIComponent(REDIRECT)}`;
+}
+
+async function handleRedirect() {
+  const params = new URLSearchParams(window.location.search);
+  const code   = params.get('code');
+  if (!code) return false;
+  // Exchange code for token
+  const verifier = sessionStorage.getItem('pkce_verifier');
+  const body = new URLSearchParams({
+    client_id:     CLIENT_ID,
+    code,
+    redirect_uri:  REDIRECT,
+    grant_type:    'authorization_code',
+    code_verifier: verifier,
+    scope:         SCOPES
+  });
+  const res  = await fetch(`https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`, {
+    method: 'POST', body,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  });
+  const data = await res.json();
+  if (data.access_token) {
+    sessionStorage.setItem('usi_token', data.access_token);
+    sessionStorage.setItem('usi_token_exp', Date.now() + (data.expires_in - 60) * 1000);
+    // Clean up URL
+    window.history.replaceState({}, '', REDIRECT);
+    return true;
   }
+  console.error('Token exchange failed:', data);
+  return false;
 }
 
 async function graphGet(token, url) {
@@ -573,25 +616,25 @@ function show(id) {
   });
 }
 
-async function signIn() {
-  try {
-    await msalApp.loginRedirect({ scopes: SCOPES });
-    loadDashboard();
-  } catch(e) { console.error(e); }
-}
-
-function signOut() {
-  msalApp.logoutRedirect();
-  show('loginView');
-}
-
-// On load — check if already signed in
+// On load — handle redirect or check for existing token
 (async () => {
-  await msalApp.initialize();
-  const accounts = msalApp.getAllAccounts();
-  if (accounts.length > 0) {
-    loadDashboard();
-  } else {
+  try {
+    // If returning from Microsoft login with a code
+    if (window.location.search.includes('code=')) {
+      show('loadingView');
+      const ok = await handleRedirect();
+      if (ok) { loadDashboard(); return; }
+    }
+    // Check for stored token
+    const token = sessionStorage.getItem('usi_token');
+    const expiry = parseInt(sessionStorage.getItem('usi_token_exp') || '0');
+    if (token && Date.now() < expiry) {
+      loadDashboard();
+    } else {
+      show('loginView');
+    }
+  } catch(e) {
+    console.error(e);
     show('loginView');
   }
 })();
