@@ -266,7 +266,7 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
 // ── CONFIG ──
 const CLIENT_ID = '3565db63-2a61-4eaf-a84e-7577e5369a5c';
 const TENANT_ID = '53e2c3bd-d5d4-443d-bd75-e93b8d6a32c1';
-const SCOPES    = 'Files.Read.All Sites.Read.All User.Read';
+const SCOPES    = 'https://graph.microsoft.com/Files.Read.All https://graph.microsoft.com/Sites.Read.All';
 const REDIRECT  = window.location.href.split('?')[0].split('#')[0];
 let hdChartInst, psChartInst;
 
