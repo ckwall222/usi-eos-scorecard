@@ -498,21 +498,42 @@ function buildScorecardTable(rows, weekCols) {
       html += `<tr class="cat-row"><td colspan="${4 + weeks.length + 1}">${cat}</td></tr>`;
       lastCat = cat;
     }
-    const tgt = parseFloat(target) || 0;
-    const lower = measure && (measure.toLowerCase().includes('breach') || measure.toLowerCase().includes('return') || measure.toLowerCase().includes('strike'));
+    // Detect if this is a percentage metric (target is text like '<5%' or value is a small decimal)
+    const targetStr  = String(target || '');
+    const isPct      = targetStr.includes('%') || measure.toLowerCase().includes('a/r') || measure.toLowerCase().includes('margin');
+    const tgt        = isPct ? parseFloat(targetStr) / (targetStr.includes('%') ? 100 : 1) : (parseFloat(target) ?? 0);
+    const tgtNum     = isNaN(tgt) ? null : tgt;
+    const lower      = measure && (measure.toLowerCase().includes('breach') || measure.toLowerCase().includes('return') || measure.toLowerCase().includes('strike') || measure.toLowerCase().includes('a/r'));
+
+    // Format a value for display — handle percentages, currency, plain numbers, and zero
+    const fmtVal = (v) => {
+      if (v === null || v === undefined || isNaN(v)) return '-';
+      if (isPct) return (v * 100).toFixed(1) + '%';
+      if (Math.abs(v) >= 1000) return fmt$(v);
+      return fmtN(v, 1);
+    };
+
+    // Target display — preserve text targets like '<5%', handle 0 explicitly
+    const tgtDisp = targetStr === '' || targetStr === 'null' ? '-'
+                  : isPct && targetStr.includes('%') ? targetStr  // show '<5%' as-is
+                  : target === 0 || target === '0' ? '0'
+                  : tgtNum !== null ? fmtVal(tgtNum) : targetStr;
+
     const weekCells = actuals.slice(0, weeks.length).map(a => {
       const v = parseFloat(a);
-      return `<td>${ragBadge(v, tgt, lower)}</td>`;
+      return `<td>${ragBadge(v, tgtNum, lower, fmtVal(isNaN(v) ? null : v))}</td>`;
     }).join('');
+
     const sum = actuals.slice(0, weeks.length).reduce((s,a) => s + (parseFloat(a)||0), 0);
-    const tgtDisp = tgt ? (tgt >= 1000 ? fmt$(tgt) : fmtN(tgt,1)) : '-';
+    const sumDisp = actuals.slice(0, weeks.length).some(a => parseFloat(a) || a == 0 && String(a) !== '') ? fmtVal(sum) : '-';
+
     html += `<tr>
       <td></td>
       <td>${measure || ''}</td>
       <td class="tgt">${tgtDisp}</td>
       <td class="own">${owner || ''}</td>
       ${weekCells}
-      <td>${sum ? (sum >= 1000 ? fmt$(sum) : fmtN(sum,1)) : '-'}</td>
+      <td>${sumDisp}</td>
     </tr>`;
   });
 
