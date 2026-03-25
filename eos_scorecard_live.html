@@ -501,20 +501,21 @@ async function loadDashboard() {
     const token = await getToken();
 
     // Resolve SharePoint drive + file
-    const siteInfo = await graphGet(token, `/sites/${CONFIG.siteHost}:${CONFIG.sitePath}`);
+    const siteInfo = await graphGet(token, `/sites/universalsystemsinc100.sharepoint.com:/sites/L10`);
     const driveInfo = await graphGet(token, `/sites/${siteInfo.id}/drive`);
     const driveId = driveInfo.id;
 
     // Find the file
-    const encoded = encodeURIComponent(CONFIG.filePath);
-    const fileInfo = await graphGet(token, `/drives/${driveId}/root:${CONFIG.filePath.replace('/sites/L10','')}:`);
+    const searchRes = await graphGet(token, `/drives/${driveId}/root/search(q='EOS%20Scorecard%20Data')`);
+    const fileInfo = searchRes.value.find(f => f.name === 'EOS Scorecard Data Sheet.xlsx') || searchRes.value[0];
+    if (!fileInfo) throw new Error('EOS Scorecard Data Sheet.xlsx not found in L10 drive.');
     const itemId = fileInfo.id;
 
     // Read Scorecard sheet rows 1-30, cols A-S
     const [scoreRange, rocksRange, funnelRange] = await Promise.all([
-      getExcelRange(token, driveId, itemId, CONFIG.sheetScorecard, 'A1:S30'),
-      getExcelRange(token, driveId, itemId, CONFIG.sheetRocks, 'A1:H8'),
-      getExcelRange(token, driveId, itemId, CONFIG.sheetFunnel, 'B6:C32')
+      getExcelRange(token, driveId, itemId, 'EOS Scorecard Tracking', 'A1:S30'),
+      getExcelRange(token, driveId, itemId, 'Rocks ScoreCard', 'A1:H8'),
+      getExcelRange(token, driveId, itemId, ' Funnel Assumptions', 'B6:C32')
     ]);
 
     const sv = scoreRange.values;
