@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -865,25 +865,27 @@ document.getElementById('weekBadge').textContent = `Q1 2026 · ${latestMonth}` +
     }));
     document.getElementById('rocksGrid').innerHTML = buildRocks(rocks);
 
-    // ── Funnel data (col C = index 1, find by row label)
-    const fmap = {};
-    fv.forEach(row => { if (row[0] && row[1] != null) fmap[String(row[0]).trim()] = parseFloat(row[1]) || 0; });
+    // ── Funnel data — row-index based to avoid duplicate label collisions
+    // Funnel Assumptions sheet: col B=0(label), col C=1(value) in the API response
+    const fv2 = fv; // alias for clarity
+    const frow = (idx) => parseFloat(fv2[idx]?.[1]) || 0;
 
-    document.getElementById('fHDTarget').textContent = fmt$(fmap['2026 Hardware & Devices Target'] || hdAnnual);
-    document.getElementById('fHDPrior').textContent  = fmt$(fmap['2025 Revenue'] || 0);
-    document.getElementById('fHDGoGet').textContent  = fmt$(fmap['2026 Go Get Number'] || 0);
-    document.getElementById('fHDCust').textContent   = Math.round(fmap['New Customers Needed'] || 0) + ' customers';
-    document.getElementById('fHDOpps').textContent   = Math.round(fmap['Opportunities Needed (40% win rate)'] || 0);
-    document.getElementById('fHDLeads').textContent  = fmtN(fmap['Weekly Leads Needed'] || 0,1) + ' / week';
+    // H&D section (rows 10-18, 0-based idx 9-17)
+    document.getElementById('fHDTarget').textContent = fmt$(frow(9) || hdAnnual);
+    document.getElementById('fHDPrior').textContent  = fmt$(frow(10));
+    document.getElementById('fHDGoGet').textContent  = fmt$(frow(12));
+    document.getElementById('fHDCust').textContent   = Math.round(frow(15)) + ' customers';
+    document.getElementById('fHDOpps').textContent   = Math.round(frow(16));
+    document.getElementById('fHDLeads').textContent  = fmtN(frow(17), 1) + ' / week';
 
-    const psKeys = Object.keys(fmap).filter(k => k.includes('IXE'));
-    document.getElementById('fPSTarget').textContent = fmt$(fmap['IXE Target Revenue'] || psAnnual);
-    document.getElementById('fPSPrior').textContent  = fmt$(fmap['2025 Revenue'] || 0);
-    document.getElementById('fPSGoGet').textContent  = fmt$(fmap['2026 Go Get Number'] || 0);
-    document.getElementById('fPSACV').textContent    = fmt$(fmap['Ave Annual Customer Value '] || 0);
-    document.getElementById('fPSCust').textContent   = Math.round(fmap['New Customers Needed'] || 0) + ' customers';
-    document.getElementById('fPSOpps').textContent   = Math.round(fmap['Opportunities Needed (30% win rate)'] || 0);
-    document.getElementById('fPSLeads').textContent  = fmtN(fmap['Weekly Leads Needed'] || 0,1) + ' / week';
+    // IXE/PS section (rows 20-26, 0-based idx 19-25)
+    document.getElementById('fPSTarget').textContent = fmt$(frow(19) || psAnnual);
+    document.getElementById('fPSPrior').textContent  = fmt$(frow(20));
+    document.getElementById('fPSGoGet').textContent  = fmt$(frow(22));
+    document.getElementById('fPSACV').textContent    = fmt$(frow(21));
+    document.getElementById('fPSCust').textContent   = Math.round(frow(23)) + ' customers';
+    document.getElementById('fPSOpps').textContent   = Math.round(frow(24));
+    document.getElementById('fPSLeads').textContent  = fmtN(frow(25), 1) + ' / week';
 
     // ── Load TechOS P&L from Finance SharePoint site
     try {
