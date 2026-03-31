@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>USI Time Card</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f6f8; color: #111827; min-height: 100vh; }
+
+/* ── Auth screens ── */
+.auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; gap: 16px; }
+.auth-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 2.5rem; text-align: center; max-width: 420px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,0.07); }
+.auth-logo { font-size: 10px; text-transform: uppercase; letter-spacing: 0.16em; color: #0f766e; font-weight: 700; margin-bottom: 10px; }
+.auth-card h2 { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 6px; }
+.auth-card p { font-size: 13px; color: #6b7280; margin-bottom: 2rem; line-height: 1.6; }
+.btn-ms { background: #2563eb; color: #fff; border: none; border-radius: 8px; padding: 13px 28px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.btn-ms:hover { background: #1d4ed8; }
+.spinner { width: 28px; height: 28px; border: 3px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Top bar ── */
+.topbar { background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 56px; position: sticky; top: 0; z-index: 100; }
+.topbar-brand { font-size: 15px; font-weight: 700; color: #111827; display: flex; align-items: center; gap: 8px; }
+.topbar-brand span { color: #0f766e; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.user-chip { display: flex; align-items: center; gap: 8px; background: #f3f4f6; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 500; color: #374151; }
+.user-avatar { width: 24px; height: 24px; border-radius: 50%; background: #0f766e; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.btn-sm { background: none; border: 1px solid #e5e7eb; border-radius: 6px; padding: 5px 12px; font-size: 11px; color: #6b7280; cursor: pointer; }
+.btn-sm:hover { background: #f3f4f6; }
+.btn-primary { background: #0f766e; color: #fff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-primary:hover { background: #0d6460; }
+.btn-secondary { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-secondary:hover { background: #e5e7eb; }
+.btn-danger { background: #dc2626; color: #fff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+/* ── Main layout ── */
+.main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+.page-title { font-size: 22px; font-weight: 700; color: #111827; }
+.page-sub { font-size: 13px; color: #6b7280; margin-top: 3px; }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── Pay period nav ── */
+.period-nav { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 14px; }
+.period-label { font-size: 13px; font-weight: 600; color: #111827; min-width: 180px; text-align: center; }
+.period-btn { background: none; border: 1px solid #e5e7eb; border-radius: 5px; width: 28px; height: 28px; cursor: pointer; font-size: 14px; color: #6b7280; display: flex; align-items: center; justify-content: center; }
+.period-btn:hover { background: #f3f4f6; }
+
+/* ── Status badge ── */
+.status-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 9px; border-radius: 4px; }
+.status-draft     { background: #fef3c7; color: #d97706; }
+.status-submitted { background: #d1fae5; color: #065f46; }
+.status-approved  { background: #dbeafe; color: #1e40af; }
+
+/* ── Timecard grid ── */
+.tc-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; }
+.tc-header { background: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+.tc-period { font-size: 12px; font-weight: 600; color: #374151; }
+.tc-wrap { overflow-x: auto; }
+table.tc { width: 100%; border-collapse: collapse; min-width: 700px; }
+table.tc thead th { background: #f9fafb; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #6b7280; padding: 10px 8px; text-align: center; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+table.tc thead th.th-date { text-align: left; padding-left: 18px; width: 110px; }
+table.tc tbody td { padding: 6px 8px; border-bottom: 1px solid #f3f4f6; text-align: center; vertical-align: middle; }
+table.tc tbody td.td-date { text-align: left; padding-left: 18px; }
+table.tc tbody tr.weekend td { background: #f9fafb; }
+table.tc tbody tr.weekend td.td-date { color: #9ca3af; }
+table.tc tbody tr.today td.td-date { font-weight: 700; color: #0f766e; }
+.date-cell { font-size: 12px; color: #374151; }
+.date-day  { font-size: 10px; color: #9ca3af; }
+.tc-input { width: 52px; border: 1px solid #e5e7eb; border-radius: 5px; padding: 5px 4px; font-size: 13px; text-align: center; background: #fff; color: #111827; }
+.tc-input:focus { outline: none; border-color: #0f766e; box-shadow: 0 0 0 2px rgba(15,118,110,0.1); }
+.tc-input:disabled { background: #f9fafb; color: #9ca3af; cursor: not-allowed; }
+.tc-input.weekend { background: #f9fafb; }
+table.tc tfoot td { background: #f9fafb; font-size: 12px; font-weight: 700; color: #111827; padding: 10px 8px; text-align: center; border-top: 2px solid #e5e7eb; }
+table.tc tfoot td.tf-label { text-align: left; padding-left: 18px; color: #6b7280; }
+.col-R { background: rgba(37,99,235,0.03); }
+.col-O { background: rgba(220,38,38,0.03); }
+.col-P { background: rgba(15,118,110,0.03); }
+.col-H { background: rgba(124,58,237,0.03); }
+.col-E { background: rgba(217,119,6,0.03); }
+.col-M { background: rgba(107,114,128,0.03); }
+.col-T { background: rgba(251,146,60,0.03); }
+
+/* ── Totals summary bar ── */
+.totals-bar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 1.5rem; }
+.total-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px; text-align: center; }
+.total-val { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; color: #111827; line-height: 1; }
+.total-lbl { font-size: 10px; color: #6b7280; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+.total-card.has-val .total-val { color: #0f766e; }
+.total-card.has-ot  .total-val { color: #dc2626; }
+
+/* ── Notes ── */
+.notes-area { width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #111827; resize: vertical; min-height: 70px; font-family: inherit; }
+.notes-area:focus { outline: none; border-color: #0f766e; }
+
+/* ── Time off section ── */
+.pto-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+.pto-title { font-size: 14px; font-weight: 600; color: #111827; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label { font-size: 11px; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.06em; }
+.form-input { border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 12px; font-size: 13px; color: #111827; background: #fff; }
+.form-input:focus { outline: none; border-color: #0f766e; box-shadow: 0 0 0 2px rgba(15,118,110,0.1); }
+.form-select { border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 12px; font-size: 13px; color: #111827; background: #fff; cursor: pointer; }
+.form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+
+/* ── PTO requests list ── */
+.pto-list { display: grid; gap: 8px; }
+.pto-item { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+.pto-item-left { font-size: 13px; }
+.pto-item-title { font-weight: 600; color: #111827; }
+.pto-item-sub { font-size: 11px; color: #6b7280; margin-top: 2px; }
+.pto-status-pending  { background: #fef3c7; color: #d97706; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 4px; text-transform: uppercase; }
+.pto-status-approved { background: #d1fae5; color: #065f46; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 4px; text-transform: uppercase; }
+.pto-status-denied   { background: #fee2e2; color: #dc2626; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 4px; text-transform: uppercase; }
+
+/* ── Toast ── */
+.toast { position: fixed; bottom: 24px; right: 24px; background: #111827; color: #fff; border-radius: 8px; padding: 12px 18px; font-size: 13px; font-weight: 500; opacity: 0; transform: translateY(12px); transition: all 0.25s; z-index: 999; max-width: 320px; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: #065f46; }
+.toast.error   { background: #b91c1c; }
+
+/* ── Legend ── */
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 1rem; }
+.leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #6b7280; }
+.leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+/* ── Divider ── */
+.divider { border: none; border-top: 1px solid #e5e7eb; margin: 1.5rem 0; }
+
+/* ── Error banner ── */
+.err-banner { background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #b91c1c; margin-bottom: 1rem; }
+
+/* ── Tabs ── */
+.tabs { display: flex; gap: 2px; background: #f3f4f6; border-radius: 8px; padding: 3px; margin-bottom: 1.5rem; width: fit-content; }
+.tab { padding: 7px 18px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; color: #6b7280; border: none; background: none; }
+.tab.active { background: #fff; color: #111827; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginScreen" class="auth-screen" style="display:none;">
+  <div class="auth-card">
+    <div class="auth-logo">Universal Systems Inc.</div>
+    <h2>USI Time Card</h2>
+    <p>Sign in with your Microsoft 365 account to view and submit your timecard.</p>
+    <button class="btn-ms" onclick="signIn()">
+      <svg width="18" height="18" viewBox="0 0 21 21"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
+      Sign in with Microsoft
+    </button>
+  </div>
+</div>
+
+<!-- Loading -->
+<div id="loadingScreen" class="auth-screen" style="display:none;">
+  <div class="spinner"></div>
+  <p style="color:#6b7280;font-size:13px;" id="loadingMsg">Loading...</p>
+</div>
+
+<!-- Main App -->
+<div id="appScreen" style="display:none;">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="#0f766e"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="#0f766e" opacity="0.5"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="#0f766e" opacity="0.5"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="#0f766e"/></svg>
+      USI <span>Time Card</span>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <div class="user-avatar" id="userInitials">?</div>
+        <span id="userName">Loading...</span>
+      </div>
+      <button class="btn-sm" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div id="errBanner" class="err-banner" style="display:none;"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('timecard')">My Timecard</button>
+      <button class="tab" onclick="switchTab('timeoff')">Time Off</button>
+    </div>
+
+    <!-- ── TIMECARD TAB ── -->
+    <div id="tabTimecard">
+      <div class="page-header">
+        <div>
+          <div class="page-title" id="tcPageTitle">Timecard</div>
+          <div class="page-sub" id="tcPageSub">Loading pay period...</div>
+        </div>
+        <div class="header-actions">
+          <div class="period-nav">
+            <button class="period-btn" onclick="changePeriod(-1)">&#8249;</button>
+            <div class="period-label" id="periodLabel">Loading...</div>
+            <button class="period-btn" onclick="changePeriod(1)">&#8250;</button>
+          </div>
+          <button class="btn-secondary" onclick="saveDraft()">Save Draft</button>
+          <button class="btn-primary" onclick="submitTimecard()">Submit</button>
+        </div>
+      </div>
+
+      <!-- Totals summary -->
+      <div class="totals-bar">
+        <div class="total-card" id="tot-R"><div class="total-val" id="tot-R-val">0</div><div class="total-lbl">Regular</div></div>
+        <div class="total-card" id="tot-O"><div class="total-val" id="tot-O-val">0</div><div class="total-lbl">Overtime</div></div>
+        <div class="total-card" id="tot-P"><div class="total-val" id="tot-P-val">0</div><div class="total-lbl">PTO</div></div>
+        <div class="total-card" id="tot-H"><div class="total-val" id="tot-H-val">0</div><div class="total-lbl">Holiday</div></div>
+        <div class="total-card" id="tot-E"><div class="total-val" id="tot-E-val">$0</div><div class="total-lbl">Expenses</div></div>
+        <div class="total-card" id="tot-M"><div class="total-val" id="tot-M-val">0 mi</div><div class="total-lbl">Mileage</div></div>
+        <div class="total-card" id="tot-T"><div class="total-val" id="tot-T-val">0</div><div class="total-lbl">Travel Days</div></div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#dbeafe;"></div>R = Regular hrs</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#fee2e2;"></div>O = Overtime hrs</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#d1fae5;"></div>P = PTO hrs</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#ede9fe;"></div>H = Holiday hrs</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#fef3c7;"></div>E = Expense $</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#f3f4f6;"></div>M = Mileage (miles)</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#ffedd5;"></div>T = Travel (hrs)</div>
+      </div>
+
+      <!-- Timecard grid -->
+      <div class="tc-card">
+        <div class="tc-header">
+          <span class="tc-period" id="tcCardPeriod">Pay Period</span>
+          <span class="status-badge status-draft" id="tcStatus">Draft</span>
+        </div>
+        <div class="tc-wrap">
+          <table class="tc" id="tcTable">
+            <thead>
+              <tr>
+                <th class="th-date">Date</th>
+                <th class="col-R">R</th>
+                <th class="col-O">O</th>
+                <th class="col-P">P</th>
+                <th class="col-H">H</th>
+                <th class="col-E">E ($)</th>
+                <th class="col-M">M (mi)</th>
+                <th class="col-T">T (hrs)</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="tcBody"></tbody>
+            <tfoot>
+              <tr>
+                <td class="tf-label">TOTALS</td>
+                <td class="col-R" id="tf-R">0</td>
+                <td class="col-O" id="tf-O">0</td>
+                <td class="col-P" id="tf-P">0</td>
+                <td class="col-H" id="tf-H">0</td>
+                <td class="col-E" id="tf-E">$0</td>
+                <td class="col-M" id="tf-M">0</td>
+                <td class="col-T" id="tf-T">0</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mileage reimbursement note -->
+      <div style="font-size:11px;color:#9ca3af;margin-bottom:1rem;">
+        Mileage reimbursement rate: $0.67/mile &nbsp;·&nbsp; 
+        Mileage reimbursement: <strong id="mileageReimb">$0.00</strong>
+      </div>
+
+      <!-- Period notes -->
+      <div class="tc-card" style="padding:1rem;">
+        <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:8px;">Pay Period Notes</div>
+        <textarea class="notes-area" id="periodNotes" placeholder="Add any notes for this pay period..."></textarea>
+      </div>
+    </div>
+
+    <!-- ── TIME OFF TAB ── -->
+    <div id="tabTimeoff" style="display:none;">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Time Off Requests</div>
+          <div class="page-sub">Request PTO, holidays, or other time off</div>
+        </div>
+      </div>
+
+      <!-- Request form -->
+      <div class="pto-card">
+        <div class="pto-title">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#0f766e" stroke-width="1.5"/><path d="M5 1.5V4.5M11 1.5V4.5M2 6.5H14" stroke="#0f766e" stroke-width="1.5" stroke-linecap="round"/></svg>
+          New Time Off Request
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select class="form-select" id="ptoType">
+              <option value="PTO">PTO</option>
+              <option value="Holiday">Holiday</option>
+              <option value="Sick">Sick Leave</option>
+              <option value="Bereavement">Bereavement</option>
+              <option value="Unpaid">Unpaid</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hours Requested</label>
+            <input type="number" class="form-input" id="ptoHours" placeholder="8" min="1" max="80" step="0.5">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-input" id="ptoStart">
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Date</label>
+            <input type="date" class="form-input" id="ptoEnd">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Notes / Reason</label>
+            <textarea class="notes-area" id="ptoNotes" placeholder="Optional — add any relevant details..." style="min-height:60px;"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-primary" onclick="submitPTO()">Submit Request</button>
+        </div>
+      </div>
+
+      <!-- Existing requests -->
+      <div class="pto-card">
+        <div class="pto-title">My Requests</div>
+        <div class="pto-list" id="ptoList">
+          <div style="color:#9ca3af;font-size:13px;text-align:center;padding:1rem;">Loading requests...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const CLIENT_ID  = '3565db63-2a61-4eaf-a84e-7577e5369a5c';
+const TENANT_ID  = '53e2c3bd-d5d4-443d-bd75-e93b8d6a32c1';
+const REDIRECT   = window.location.href.split('?')[0].split('#')[0];
+const SCOPES     = 'https://graph.microsoft.com/Files.Read.All https://graph.microsoft.com/Sites.Read.All https://graph.microsoft.com/Sites.ReadWrite.All https://graph.microsoft.com/User.Read';
+const SITE_HOST  = 'universalsystemsinc100.sharepoint.com';
+const SITE_PATH  = '/sites/L10';
+const MILE_RATE  = 0.67;
+
+// Pay periods — bi-weekly, anchor to a known Monday
+const PERIOD_ANCHOR = new Date('2026-03-02'); // Known pay period start (Monday)
+
+let currentUser = null;
+let siteId = null;
+let driveId = null;
+let timecardListId = null;
+let ptoListId = null;
+let currentPeriodOffset = 0; // 0 = current period
+let tcData = {}; // keyed by date string 'YYYY-MM-DD' -> {R,O,P,H,E,M,T,notes}
+let tcStatus = 'draft';
+let tcItemId = null; // SharePoint list item ID if exists
+
+// ── Auth helpers ──
+function b64url(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+async function pkceChallenge() {
+  const verifier = b64url(crypto.getRandomValues(new Uint8Array(32)));
+  const digest   = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+  return { verifier, challenge: b64url(digest) };
+}
+async function signIn() {
+  const { verifier, challenge } = await pkceChallenge();
+  sessionStorage.setItem('pkce_verifier', verifier);
+  const params = new URLSearchParams({
+    client_id: CLIENT_ID, response_type: 'code',
+    redirect_uri: REDIRECT, scope: SCOPES,
+    code_challenge: challenge, code_challenge_method: 'S256',
+    response_mode: 'query'
+  });
+  window.location = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/authorize?${params}`;
+}
+function signOut() {
+  sessionStorage.clear();
+  window.location = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${encodeURIComponent(REDIRECT)}`;
+}
+async function handleRedirect() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (!code) return false;
+  const verifier = sessionStorage.getItem('pkce_verifier');
+  const body = new URLSearchParams({ client_id: CLIENT_ID, code, redirect_uri: REDIRECT, grant_type: 'authorization_code', code_verifier: verifier, scope: SCOPES });
+  const res  = await fetch(`https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`, { method:'POST', body, headers:{'Content-Type':'application/x-www-form-urlencoded'} });
+  const data = await res.json();
+  if (data.access_token) {
+    sessionStorage.setItem('usi_token', data.access_token);
+    sessionStorage.setItem('usi_token_exp', Date.now() + (data.expires_in - 60) * 1000);
+    window.history.replaceState({}, '', REDIRECT);
+    return true;
+  }
+  return false;
+}
+async function getToken() {
+  const token  = sessionStorage.getItem('usi_token');
+  const expiry = parseInt(sessionStorage.getItem('usi_token_exp') || '0');
+  if (token && Date.now() < expiry) return token;
+  await signIn(); throw new Error('Redirecting...');
+}
+
+// ── Graph API ──
+async function graph(method, path, body) {
+  const token = await getToken();
+  const opts = { method, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(`https://graph.microsoft.com/v1.0${path}`, opts);
+  if (!r.ok) { const t = await r.text(); throw new Error(`(${r.status}) ${path}\n${t}`); }
+  if (r.status === 204) return null;
+  return r.json();
+}
+
+// ── Pay period helpers ──
+function getPeriodDates(offset) {
+  // Bi-weekly — 14-day periods from anchor
+  const start = new Date(PERIOD_ANCHOR);
+  const daysSinceAnchor = Math.floor((Date.now() - PERIOD_ANCHOR.getTime()) / 86400000);
+  const currentPeriodIdx = Math.floor(daysSinceAnchor / 14);
+  start.setDate(PERIOD_ANCHOR.getDate() + (currentPeriodIdx + offset) * 14);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 13);
+  return { start, end };
+}
+function fmtDate(d) {
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function toISO(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function isWeekend(d) { const day = d.getDay(); return day === 0 || day === 6; }
+function isToday(d) { return toISO(d) === toISO(new Date()); }
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+// ── Render timecard ──
+function renderTimecard() {
+  const { start, end } = getPeriodDates(currentPeriodOffset);
+  const startStr = fmtDate(start), endStr = fmtDate(end);
+  document.getElementById('periodLabel').textContent = `${startStr} – ${endStr}`;
+  document.getElementById('tcCardPeriod').textContent = `Pay Period: ${startStr} – ${endStr}`;
+  document.getElementById('tcPageTitle').textContent = `My Timecard`;
+  document.getElementById('tcPageSub').textContent = `${startStr} – ${endStr}`;
+
+  const tbody = document.getElementById('tcBody');
+  tbody.innerHTML = '';
+  const cur = new Date(start);
+  while (cur <= end) {
+    const iso = toISO(cur);
+    const d = tcData[iso] || {};
+    const we = isWeekend(cur);
+    const td = isToday(cur);
+    const dis = we || tcStatus === 'submitted' ? 'disabled' : '';
+    const cls = we ? 'weekend' : (td ? 'today' : '');
+    tbody.innerHTML += `<tr class="${cls}">
+      <td class="td-date">
+        <div class="date-cell">${cur.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+        <div class="date-day">${DAYS[cur.getDay()]}</div>
+      </td>
+      <td class="col-R"><input class="tc-input ${we?'weekend':''}" type="number" min="0" max="24" step="0.5" ${dis} data-date="${iso}" data-col="R" value="${d.R||''}" onchange="updateCell(this)" placeholder="-"></td>
+      <td class="col-O"><input class="tc-input ${we?'weekend':''}" type="number" min="0" max="24" step="0.5" ${dis} data-date="${iso}" data-col="O" value="${d.O||''}" onchange="updateCell(this)" placeholder="-"></td>
+      <td class="col-P"><input class="tc-input ${we?'weekend':''}" type="number" min="0" max="24" step="0.5" ${dis} data-date="${iso}" data-col="P" value="${d.P||''}" onchange="updateCell(this)" placeholder="-"></td>
+      <td class="col-H"><input class="tc-input ${we?'weekend':''}" type="number" min="0" max="24" step="0.5" ${dis} data-date="${iso}" data-col="H" value="${d.H||''}" onchange="updateCell(this)" placeholder="-"></td>
+      <td class="col-E"><input class="tc-input ${we?'weekend':''}" type="number" min="0" step="0.01" ${dis} data-date="${iso}" data-col="E" value="${d.E||''}" onchange="updateCell(this)" placeholder="-" style="width:62px;"></td>
+      <td class="col-M"><input class="tc-input ${we?'weekend':''}" type="number" min="0" step="1" ${dis} data-date="${iso}" data-col="M" value="${d.M||''}" onchange="updateCell(this)" placeholder="-"></td>
+      <td class="col-T"><input class="tc-input ${we?'weekend':''}" type="number" min="0" max="24" step="0.5" ${dis} data-date="${iso}" data-col="T" value="${d.T||''}" onchange="updateCell(this)" placeholder="-"></td>
+      <td><input class="tc-input" type="text" ${dis} data-date="${iso}" data-col="notes" value="${d.notes||''}" onchange="updateCell(this)" placeholder="" style="width:100%;min-width:80px;"></td>
+    </tr>`;
+    cur.setDate(cur.getDate() + 1);
+  }
+  updateTotals();
+  updateStatus();
+}
+
+function updateCell(el) {
+  const date = el.dataset.date;
+  const col  = el.dataset.col;
+  if (!tcData[date]) tcData[date] = {};
+  tcData[date][col] = el.value;
+  updateTotals();
+}
+
+function updateTotals() {
+  const cols = ['R','O','P','H','E','M','T'];
+  const totals = {};
+  cols.forEach(c => totals[c] = 0);
+  Object.values(tcData).forEach(d => {
+    cols.forEach(c => { if (d[c]) totals[c] += parseFloat(d[c]) || 0; });
+  });
+  // Summary bar
+  const setTot = (id, val, cls) => {
+    const el = document.getElementById(`tot-${id}-val`);
+    const card = document.getElementById(`tot-${id}`);
+    if (el) el.textContent = val;
+    if (card) { card.className = 'total-card'; if (parseFloat(val) > 0) card.classList.add(cls||'has-val'); }
+  };
+  setTot('R', totals.R.toFixed(1));
+  setTot('O', totals.O.toFixed(1), 'has-ot');
+  setTot('P', totals.P.toFixed(1));
+  setTot('H', totals.H.toFixed(1));
+  setTot('E', '$'+totals.E.toFixed(2));
+  setTot('M', totals.M.toFixed(0)+' mi');
+  setTot('T', totals.T.toFixed(1));
+  // Footer
+  document.getElementById('tf-R').textContent = totals.R.toFixed(1);
+  document.getElementById('tf-O').textContent = totals.O.toFixed(1);
+  document.getElementById('tf-P').textContent = totals.P.toFixed(1);
+  document.getElementById('tf-H').textContent = totals.H.toFixed(1);
+  document.getElementById('tf-E').textContent = '$'+totals.E.toFixed(2);
+  document.getElementById('tf-M').textContent = totals.M.toFixed(0);
+  document.getElementById('tf-T').textContent = totals.T.toFixed(1);
+  document.getElementById('mileageReimb').textContent = '$'+(totals.M * MILE_RATE).toFixed(2);
+}
+
+function updateStatus() {
+  const el = document.getElementById('tcStatus');
+  el.textContent = tcStatus.charAt(0).toUpperCase() + tcStatus.slice(1);
+  el.className = 'status-badge status-' + tcStatus;
+}
+
+function changePeriod(delta) {
+  currentPeriodOffset += delta;
+  tcData = {};
+  tcStatus = 'draft';
+  tcItemId = null;
+  document.getElementById('periodNotes').value = '';
+  loadTimecardData();
+}
+
+// ── SharePoint list operations ──
+async function ensureLists() {
+  setLoading('Setting up timekeeping lists...');
+  try {
+    const site = await graph('GET', `/sites/${SITE_HOST}:${SITE_PATH}`);
+    siteId = site.id;
+    // Get existing lists
+    const lists = await graph('GET', `/sites/${siteId}/lists?$select=id,name`);
+    const listMap = {};
+    lists.value.forEach(l => { listMap[l.name] = l.id; });
+
+    // Create USI_Timecards if not exists
+    if (!listMap['USI_Timecards']) {
+      const created = await graph('POST', `/sites/${siteId}/lists`, {
+        displayName: 'USI_Timecards',
+        columns: [
+          { name:'EmployeeEmail', text:{} },
+          { name:'EmployeeName', text:{} },
+          { name:'PayPeriodStart', dateTime:{} },
+          { name:'PayPeriodEnd', dateTime:{} },
+          { name:'TimecardData', text:{allowMultipleLines:true} },
+          { name:'PeriodNotes', text:{allowMultipleLines:true} },
+          { name:'Status', text:{} },
+          { name:'TotalRegular', number:{} },
+          { name:'TotalOT', number:{} },
+          { name:'TotalPTO', number:{} },
+          { name:'TotalMileage', number:{} },
+          { name:'TotalExpenses', number:{} }
+        ],
+        list: { template: 'genericList' }
+      });
+      timecardListId = created.id;
+    } else {
+      timecardListId = listMap['USI_Timecards'];
+    }
+
+    // Create USI_TimeOffRequests if not exists
+    if (!listMap['USI_TimeOffRequests']) {
+      const created2 = await graph('POST', `/sites/${siteId}/lists`, {
+        displayName: 'USI_TimeOffRequests',
+        columns: [
+          { name:'EmployeeEmail', text:{} },
+          { name:'EmployeeName', text:{} },
+          { name:'RequestType', text:{} },
+          { name:'StartDate', dateTime:{} },
+          { name:'EndDate', dateTime:{} },
+          { name:'HoursRequested', number:{} },
+          { name:'RequestNotes', text:{allowMultipleLines:true} },
+          { name:'Status', text:{} },
+          { name:'ManagerNotes', text:{allowMultipleLines:true} }
+        ],
+        list: { template: 'genericList' }
+      });
+      ptoListId = created2.id;
+    } else {
+      ptoListId = listMap['USI_TimeOffRequests'];
+    }
+  } catch(e) {
+    showError('Could not set up SharePoint lists: ' + e.message + '\n\nYou may need Sites.ReadWrite.All permission granted by your admin.');
+    timecardListId = null;
+    ptoListId = null;
+  }
+}
+
+async function loadTimecardData() {
+  const { start, end } = getPeriodDates(currentPeriodOffset);
+  const startISO = toISO(start);
+  renderTimecard();
+  if (!timecardListId || !siteId) return;
+  try {
+    const filter = encodeURIComponent(`fields/EmployeeEmail eq '${currentUser.email}' and fields/PayPeriodStart eq '${startISO}'`);
+    const res = await graph('GET', `/sites/${siteId}/lists/${timecardListId}/items?$filter=${filter}&$expand=fields`);
+    if (res.value && res.value.length > 0) {
+      const item = res.value[0];
+      tcItemId = item.id;
+      tcStatus = item.fields.Status || 'draft';
+      try { tcData = JSON.parse(item.fields.TimecardData || '{}'); } catch(e) { tcData = {}; }
+      document.getElementById('periodNotes').value = item.fields.PeriodNotes || '';
+    }
+  } catch(e) {
+    console.warn('Could not load timecard data:', e.message);
+  }
+  renderTimecard();
+}
+
+async function saveDraft() {
+  await saveTimecard('draft');
+}
+async function submitTimecard() {
+  if (!confirm('Submit this timecard? You will not be able to edit it after submission.')) return;
+  await saveTimecard('submitted');
+}
+
+async function saveTimecard(status) {
+  if (!timecardListId || !siteId) { showToast('SharePoint not connected — saving locally only', 'error'); return; }
+  const { start, end } = getPeriodDates(currentPeriodOffset);
+  // Calculate totals
+  const tots = {R:0,O:0,P:0,H:0,E:0,M:0,T:0};
+  Object.values(tcData).forEach(d => {
+    Object.keys(tots).forEach(k => { if (d[k]) tots[k] += parseFloat(d[k])||0; });
+  });
+  const fields = {
+    EmployeeEmail: currentUser.email,
+    EmployeeName: currentUser.name,
+    PayPeriodStart: toISO(start),
+    PayPeriodEnd: toISO(end),
+    TimecardData: JSON.stringify(tcData),
+    PeriodNotes: document.getElementById('periodNotes').value,
+    Status: status,
+    TotalRegular: tots.R,
+    TotalOT: tots.O,
+    TotalPTO: tots.P,
+    TotalMileage: tots.M,
+    TotalExpenses: tots.E
+  };
+  try {
+    if (tcItemId) {
+      await graph('PATCH', `/sites/${siteId}/lists/${timecardListId}/items/${tcItemId}/fields`, fields);
+    } else {
+      const created = await graph('POST', `/sites/${siteId}/lists/${timecardListId}/items`, { fields });
+      tcItemId = created.id;
+    }
+    tcStatus = status;
+    updateStatus();
+    showToast(status === 'submitted' ? 'Timecard submitted!' : 'Draft saved', 'success');
+  } catch(e) {
+    showToast('Save failed: ' + e.message, 'error');
+  }
+}
+
+// ── PTO ──
+async function loadPTORequests() {
+  if (!ptoListId || !siteId) {
+    document.getElementById('ptoList').innerHTML = '<div style="color:#9ca3af;font-size:13px;text-align:center;padding:1rem;">SharePoint not connected</div>';
+    return;
+  }
+  try {
+    const filter = encodeURIComponent(`fields/EmployeeEmail eq '${currentUser.email}'`);
+    const res = await graph('GET', `/sites/${siteId}/lists/${ptoListId}/items?$filter=${filter}&$expand=fields&$orderby=createdDateTime desc`);
+    const list = document.getElementById('ptoList');
+    if (!res.value || res.value.length === 0) {
+      list.innerHTML = '<div style="color:#9ca3af;font-size:13px;text-align:center;padding:1rem;">No requests found</div>';
+      return;
+    }
+    list.innerHTML = res.value.map(item => {
+      const f = item.fields;
+      const statusCls = f.Status === 'Approved' ? 'pto-status-approved' : f.Status === 'Denied' ? 'pto-status-denied' : 'pto-status-pending';
+      return `<div class="pto-item">
+        <div class="pto-item-left">
+          <div class="pto-item-title">${f.RequestType} &nbsp;·&nbsp; ${f.HoursRequested} hrs</div>
+          <div class="pto-item-sub">${f.StartDate ? f.StartDate.slice(0,10) : ''} to ${f.EndDate ? f.EndDate.slice(0,10) : ''} ${f.RequestNotes ? '· '+f.RequestNotes : ''}</div>
+        </div>
+        <span class="${statusCls}">${f.Status || 'Pending'}</span>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('ptoList').innerHTML = `<div style="color:#b91c1c;font-size:13px;padding:1rem;">Could not load requests: ${e.message}</div>`;
+  }
+}
+
+async function submitPTO() {
+  const type  = document.getElementById('ptoType').value;
+  const hours = parseFloat(document.getElementById('ptoHours').value);
+  const start = document.getElementById('ptoStart').value;
+  const end   = document.getElementById('ptoEnd').value;
+  const notes = document.getElementById('ptoNotes').value;
+  if (!hours || !start || !end) { showToast('Please fill in all required fields', 'error'); return; }
+  if (!ptoListId || !siteId) { showToast('SharePoint not connected', 'error'); return; }
+  try {
+    await graph('POST', `/sites/${siteId}/lists/${ptoListId}/items`, { fields: {
+      EmployeeEmail: currentUser.email, EmployeeName: currentUser.name,
+      RequestType: type, StartDate: start, EndDate: end,
+      HoursRequested: hours, RequestNotes: notes, Status: 'Pending'
+    }});
+    showToast('Time off request submitted!', 'success');
+    document.getElementById('ptoHours').value = '';
+    document.getElementById('ptoStart').value = '';
+    document.getElementById('ptoEnd').value   = '';
+    document.getElementById('ptoNotes').value = '';
+    loadPTORequests();
+  } catch(e) {
+    showToast('Failed to submit: ' + e.message, 'error');
+  }
+}
+
+// ── UI helpers ──
+function show(id) {
+  ['loginScreen','loadingScreen','appScreen'].forEach(s => {
+    document.getElementById(s).style.display = s === id ? (s === 'appScreen' ? 'block' : 'flex') : 'none';
+  });
+}
+function setLoading(msg) { show('loadingScreen'); document.getElementById('loadingMsg').textContent = msg; }
+function showError(msg) {
+  const el = document.getElementById('errBanner');
+  el.textContent = msg; el.style.display = 'block';
+  show('appScreen');
+}
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (type ? ' '+type : '');
+  setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='timecard')||(i===1&&tab==='timeoff')));
+  document.getElementById('tabTimecard').style.display = tab === 'timecard' ? 'block' : 'none';
+  document.getElementById('tabTimeoff').style.display  = tab === 'timeoff'  ? 'block' : 'none';
+  if (tab === 'timeoff') loadPTORequests();
+}
+
+// ── Boot ──
+(async () => {
+  try {
+    // Handle OAuth redirect
+    if (window.location.search.includes('code=')) {
+      setLoading('Signing you in...');
+      const ok = await handleRedirect();
+      if (!ok) { show('loginScreen'); return; }
+    }
+    const token = sessionStorage.getItem('usi_token');
+    const expiry = parseInt(sessionStorage.getItem('usi_token_exp') || '0');
+    if (!token || Date.now() >= expiry) { show('loginScreen'); return; }
+
+    // Get user profile
+    setLoading('Loading your profile...');
+    const me = await graph('GET', '/me');
+    currentUser = {
+      name: me.displayName,
+      email: me.userPrincipalName,
+      initials: (me.displayName || '').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase()
+    };
+    document.getElementById('userName').textContent = currentUser.name;
+    document.getElementById('userInitials').textContent = currentUser.initials;
+
+    // Set up SharePoint lists
+    await ensureLists();
+
+    // Set default PTO dates to today
+    const today = toISO(new Date());
+    document.getElementById('ptoStart').value = today;
+    document.getElementById('ptoEnd').value   = today;
+
+    // Load timecard
+    show('appScreen');
+    await loadTimecardData();
+
+  } catch(e) {
+    console.error(e);
+    if (e.message.includes('Redirecting')) return;
+    show('loginScreen');
+  }
+})();
+</script>
+</body>
+</html>
