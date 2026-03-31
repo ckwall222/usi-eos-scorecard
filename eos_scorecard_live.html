@@ -151,6 +151,38 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
 .tos-kbadge.act  { background: #d1fae5; color: #065f46; }
 .tos-kbadge.proj { background: #dbeafe; color: #1e3a8a; }
 .tos-charts { display: grid; grid-template-columns: 3fr 2fr; gap: 10px; }
+
+/* ── Prominent Opportunities ── */
+.opp-grid { display: grid; gap: 10px; }
+.opp-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem 1.25rem; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; }
+.opp-card.stage-due    { border-left: 4px solid #2563eb; }
+.opp-card.stage-prop   { border-left: 4px solid #d97706; }
+.opp-card.stage-neg    { border-left: 4px solid #7c3aed; }
+.opp-card.stage-disc   { border-left: 4px solid #0891b2; }
+.opp-card.stage-pros   { border-left: 4px solid #9ca3af; }
+.opp-card.stage-won    { border-left: 4px solid #059669; }
+.opp-card.stage-lost   { border-left: 4px solid #dc2626; opacity: 0.6; }
+.opp-left { min-width: 0; }
+.opp-name { font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 3px; }
+.opp-company { font-size: 11px; color: #6b7280; margin-bottom: 6px; }
+.opp-meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.opp-stage { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+.opp-stage.s-due  { background: #dbeafe; color: #1e40af; }
+.opp-stage.s-prop { background: #fef3c7; color: #d97706; }
+.opp-stage.s-neg  { background: #ede9fe; color: #7c3aed; }
+.opp-stage.s-disc { background: #cffafe; color: #0e7490; }
+.opp-stage.s-pros { background: #f3f4f6; color: #6b7280; }
+.opp-stage.s-won  { background: #d1fae5; color: #065f46; }
+.opp-stage.s-lost { background: #fee2e2; color: #dc2626; }
+.opp-owner { font-size: 10px; color: #9ca3af; }
+.opp-close { font-size: 10px; color: #6b7280; }
+.opp-notes { font-size: 10px; color: #6b7280; margin-top: 5px; line-height: 1.4; font-style: italic; }
+.opp-right { text-align: right; flex-shrink: 0; }
+.opp-mrr { font-size: 22px; font-weight: 800; color: #15803d; letter-spacing: -0.02em; line-height: 1; }
+.opp-mrr-lbl { font-size: 9px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; margin-top: 3px; }
+.opp-total-bar { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.opp-total-lbl { font-size: 11px; color: #6b7280; font-weight: 600; }
+.opp-total-val { font-size: 22px; font-weight: 800; color: #15803d; letter-spacing: -0.02em; }
 </style>
 </head>
 <body>
@@ -356,6 +388,21 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
         <div class="chart-lbl">TechOS % of monthly USI revenue — path to 20% goal</div>
         <div style="position:relative;height:220px;"><canvas id="tosPctChart"></canvas></div>
       </div>
+    </div>
+  </div>
+
+
+  <hr class="divider">
+
+  <!-- Prominent Opportunities -->
+  <div class="sec">
+    <div class="slbl">Prominent opportunities &nbsp;·&nbsp; active pipeline</div>
+    <div class="opp-grid" id="oppGrid">
+      <div style="color:#9ca3af;padding:1rem;text-align:center;">Loading opportunities...</div>
+    </div>
+    <div class="opp-total-bar" id="oppTotalBar" style="display:none;">
+      <span class="opp-total-lbl">Total pipeline MRR</span>
+      <span class="opp-total-val" id="oppTotalMRR">-</span>
     </div>
   </div>
 
@@ -777,6 +824,87 @@ function weekLabel(w) {
 }
 
 
+function stageInfo(stage) {
+  const s = (stage || '').toLowerCase();
+  if (s.includes('due') || s.includes('diligence')) return { cls: 'stage-due', badge: 's-due', label: stage };
+  if (s.includes('prop'))    return { cls: 'stage-prop', badge: 's-prop', label: stage };
+  if (s.includes('neg'))     return { cls: 'stage-neg',  badge: 's-neg',  label: stage };
+  if (s.includes('disc'))    return { cls: 'stage-disc', badge: 's-disc', label: stage };
+  if (s.includes('won'))     return { cls: 'stage-won',  badge: 's-won',  label: stage };
+  if (s.includes('lost'))    return { cls: 'stage-lost', badge: 's-lost', label: stage };
+  return { cls: 'stage-pros', badge: 's-pros', label: stage };
+}
+
+function renderOpportunities(v) {
+  if (!v || v.length < 2) {
+    document.getElementById('oppGrid').innerHTML = '<div style="color:#9ca3af;padding:1rem;text-align:center;">No opportunities found</div>';
+    return;
+  }
+
+  // Skip header row, filter out empty rows
+  const opps = v.slice(1).filter(r => r[0] && String(r[0]).trim());
+
+  if (!opps.length) {
+    document.getElementById('oppGrid').innerHTML = '<div style="color:#9ca3af;padding:1rem;text-align:center;">No opportunities found</div>';
+    return;
+  }
+
+  const fmtMRR = n => {
+    if (!n || isNaN(n)) return '-';
+    return '$' + Number(n).toLocaleString('en-US', {maximumFractionDigits:0});
+  };
+
+  const fmtDate = d => {
+    if (!d) return '';
+    // Handle Excel serial dates or string dates
+    const parsed = new Date(d);
+    if (isNaN(parsed.getTime())) return String(d);
+    return parsed.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  let totalMRR = 0;
+  const html = opps.map(r => {
+    const name    = String(r[0] || '').trim();
+    const company = String(r[1] || '').trim();
+    const owner   = String(r[2] || '').trim();
+    const mrr     = parseFloat(r[3]) || 0;
+    const closeDate = fmtDate(r[4]);
+    const stage   = String(r[5] || '').trim();
+    const notes   = String(r[6] || '').trim();
+    const si      = stageInfo(stage);
+
+    // Only add to total if not Closed Lost
+    if (!stage.toLowerCase().includes('lost')) totalMRR += mrr;
+
+    return `<div class="opp-card ${si.cls}">
+      <div class="opp-left">
+        <div class="opp-name">${name}</div>
+        <div class="opp-company">${company}</div>
+        <div class="opp-meta">
+          <span class="opp-stage ${si.badge}">${si.label}</span>
+          <span class="opp-owner">${owner}</span>
+          ${closeDate ? `<span class="opp-close">Close: ${closeDate}</span>` : ''}
+        </div>
+        ${notes ? `<div class="opp-notes">${notes}</div>` : ''}
+      </div>
+      <div class="opp-right">
+        <div class="opp-mrr">${fmtMRR(mrr)}</div>
+        <div class="opp-mrr-lbl">MRR</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('oppGrid').innerHTML = html;
+
+  const totalBar = document.getElementById('oppTotalBar');
+  const totalEl  = document.getElementById('oppTotalMRR');
+  if (totalBar && totalEl) {
+    totalEl.textContent = '$' + totalMRR.toLocaleString('en-US', {maximumFractionDigits:0});
+    totalBar.style.display = 'flex';
+  }
+}
+
+
 async function loadDashboard() {
   show('loadingView');
   try {
@@ -794,10 +922,11 @@ async function loadDashboard() {
     const itemId = fileInfo.id;
 
     // Read Scorecard sheet rows 1-30, cols A-S
-    const [scoreRange, rocksRange, funnelRange] = await Promise.all([
+    const [scoreRange, rocksRange, funnelRange, oppRange] = await Promise.all([
       getExcelRange(token, driveId, itemId, 'EOS Scorecard Tracking', 'A1:S36'),
       getExcelRange(token, driveId, itemId, 'Rocks ScoreCard', 'A1:H30'),
-      getExcelRange(token, driveId, itemId, ' Funnel Assumptions', 'B6:C32')
+      getExcelRange(token, driveId, itemId, ' Funnel Assumptions', 'B6:C32'),
+      getExcelRange(token, driveId, itemId, 'Prominent Opportunities', 'A1:G20')
     ]);
 
     const sv = scoreRange.values;
@@ -864,6 +993,7 @@ document.getElementById('weekBadge').textContent = `Q1 2026 · ${latestMonth}` +
       notes:  String(r[7] || '')
     }));
     document.getElementById('rocksGrid').innerHTML = buildRocks(rocks);
+    renderOpportunities(oppRange.values);
 
     // ── Funnel data — row-index based to avoid duplicate label collisions
     // Funnel Assumptions sheet: col B=0(label), col C=1(value) in the API response
