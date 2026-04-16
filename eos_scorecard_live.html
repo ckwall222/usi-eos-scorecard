@@ -67,6 +67,22 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
 .legend { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .li { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #4b5563; }
 
+/* Section label row with inline definitions toggle */
+.slbl-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; gap: 1rem; flex-wrap: wrap; }
+.slbl-row .slbl { margin-bottom: 0; }
+.defs { font-size: 10px; }
+.defs > summary { list-style: none; cursor: pointer; color: #0f766e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 10px; padding: 4px 10px; border: 1px solid #d1fae5; border-radius: 4px; background: #f0fdfa; user-select: none; }
+.defs > summary::-webkit-details-marker { display: none; }
+.defs > summary::before { content: 'ⓘ '; margin-right: 3px; }
+.defs[open] > summary { background: #ccfbf1; border-color: #5eead4; }
+.defs-body { margin-top: 10px; padding: 14px 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 12px; color: #374151; line-height: 1.55; }
+.defs-body h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; font-weight: 600; margin: 10px 0 4px; }
+.defs-body h4:first-child { margin-top: 0; }
+.defs-body ul { margin: 0 0 0 18px; padding: 0; }
+.defs-body li { margin-bottom: 3px; }
+.defs-body code { background: #eef2ff; color: #3730a3; padding: 1px 5px; border-radius: 3px; font-size: 11px; font-family: 'SFMono-Regular', Consolas, monospace; }
+.defs-body .note { color: #92400e; background: #fffbeb; border-left: 3px solid #fbbf24; padding: 6px 10px; margin-top: 8px; border-radius: 0 4px 4px 0; font-size: 11px; }
+
 /* Rocks */
 .rocks-grid { display: grid; gap: 6px; }
 .rock-row { display: grid; grid-template-columns: 1fr 130px 90px 90px; gap: 10px; align-items: center; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 7px; padding: 10px 14px; }
@@ -253,7 +269,42 @@ table.sc tbody tr.cat-row td:first-child { padding-left: 10px; }
 
   <!-- Charts -->
   <div class="sec">
-    <div class="slbl">Revenue trend &nbsp;·&nbsp; weekly actuals vs target</div>
+    <div class="slbl-row">
+      <div class="slbl">Revenue trend &nbsp;·&nbsp; monthly actuals vs target</div>
+      <details class="defs">
+        <summary>How to read this</summary>
+        <div class="defs-body">
+          <h4>What the chart shows</h4>
+          <ul>
+            <li>Each bar is a calendar month's total invoicing for that revenue stream.</li>
+            <li>The dashed red line is the monthly target.</li>
+            <li>Blue/green bars indicate the month met or exceeded target; red bars fell short.</li>
+          </ul>
+
+          <h4>How monthly actuals are calculated</h4>
+          <ul>
+            <li>The source sheet tracks revenue by ISO week (columns labeled <code>2026-Wnn</code>).</li>
+            <li>Each week is assigned to the calendar month of its Monday start date.</li>
+            <li>A month's actual = sum of all weekly actuals whose Monday falls in that month.</li>
+          </ul>
+
+          <h4>How the monthly target is calculated</h4>
+          <ul>
+            <li>Monthly target = <code>annual target ÷ 12</code> (even split across the year).</li>
+            <li>Hardware &amp; Devices and Professional Services each use their own annual target.</li>
+          </ul>
+
+          <h4>Color coding</h4>
+          <ul>
+            <li><strong>Blue / Green fill</strong> — actual ≥ monthly target.</li>
+            <li><strong>Red fill</strong> — actual below monthly target.</li>
+            <li><strong>Dashed red line</strong> — the monthly target benchmark.</li>
+          </ul>
+
+          <div class="note">The current (in-progress) month will look lower than target until the remaining weeks in that month post. Compare completed months for a like-for-like view.</div>
+        </div>
+      </details>
+    </div>
     <div class="chart-2col">
       <div class="chart-box" style="margin-bottom:0;">
         <div class="chart-lbl">Hardware &amp; Devices invoicing
@@ -670,9 +721,38 @@ function buildRocks(rocks) {
   }).join('');
 }
 
-function buildCharts(hdData, psData, weeks) {
+// Map an ISO week label (e.g. "2026-W10") to its Monday's calendar month index (0-11)
+function weekToMonthIdx(w) {
+  const m = String(w).match(/(\d{4})-W(\d+)/);
+  if (!m) return null;
+  const year = parseInt(m[1]), week = parseInt(m[2]);
+  const jan4 = new Date(year, 0, 4);
+  const startOfW1 = new Date(jan4);
+  startOfW1.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7));
+  const monday = new Date(startOfW1);
+  monday.setDate(startOfW1.getDate() + (week - 1) * 7);
+  return monday.getMonth();
+}
+
+// Aggregate a weekly actuals array into monthly buckets, preserving chronological order.
+function aggregateByMonth(weekCols, actuals) {
+  const MO = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const order = [];
+  const totals = {};
+  weekCols.forEach((w, i) => {
+    const mi = weekToMonthIdx(w);
+    if (mi === null) return;
+    if (!(mi in totals)) { totals[mi] = 0; order.push(mi); }
+    totals[mi] += parseFloat(actuals[i]) || 0;
+  });
+  return {
+    labels: order.map(mi => MO[mi]),
+    values: order.map(mi => totals[mi])
+  };
+}
+
+function buildCharts(hdData, psData, labels) {
   const gc = 'rgba(0,0,0,0.06)', lc = '#374151';
-  const labels = weeks.map(w => weekLabel(w));
 
   if (hdChartInst) hdChartInst.destroy();
   if (psChartInst) psChartInst.destroy();
@@ -974,13 +1054,17 @@ document.getElementById('weekBadge').textContent = `Q1 2026 · ${latestMonth}` +
     }
     document.getElementById('scorecardTable').innerHTML = buildScorecardTable(metricRows, weekCols);
 
-    // ── Charts
+    // ── Charts (monthly aggregation of weekly actuals; target = annual / 12)
     const hdActuals = weekColIdxs.map(ci => parseFloat(sv[16][ci]) || 0);
     const psActuals = weekColIdxs.map(ci => parseFloat(sv[21][ci]) || 0);
+    const hdMonthly = aggregateByMonth(weekCols, hdActuals);
+    const psMonthly = aggregateByMonth(weekCols, psActuals);
+    const hdMonthlyTarget = hdAnnual / 12;
+    const psMonthlyTarget = psAnnual / 12;
     buildCharts(
-      { actuals: hdActuals, target: hdWeekly },
-      { actuals: psActuals, target: psWeekly },
-      weekCols
+      { actuals: hdMonthly.values, target: hdMonthlyTarget },
+      { actuals: psMonthly.values, target: psMonthlyTarget },
+      hdMonthly.labels
     );
 
     // ── Rocks (rows 2-8 = indices 1-7)
